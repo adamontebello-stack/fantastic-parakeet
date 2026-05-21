@@ -1,0 +1,2866 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SerieTracker">
+<title>SerieTracker</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='black'/%3E%3Ctext x='16' y='22' font-size='16' font-family='Arial,sans-serif' font-weight='bold' text-anchor='middle' fill='white'%3EST%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+/* ===== CSS VARIABLES ===== */
+:root, body.theme-dark {
+  --bg: #0a0a0a;
+  --surface: #111111;
+  --surface2: #181818;
+  --surface3: #242424;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --accent: #ff2a3b;
+  --accent2: #ff5c6b;
+  --accentGlow: rgba(255,42,59,0.4);
+  --accentGlow2: rgba(255,42,59,0.15);
+  --red: #ff3b4a;
+  --blue: #2d9eff;
+  --green: #2ee8a5;
+  --amber: #ffaa33;
+  --text: #f0f0f0;
+  --muted: #666666;
+  --muted2: #aaaaaa;
+  --dub-color: #ff5e7a;
+  --dub-bg: rgba(255,94,122,0.15);
+  --dub-border: rgba(255,94,122,0.5);
+  --sub-color: #4ac7ff;
+  --sub-bg: rgba(74,199,255,0.15);
+  --sub-border: rgba(74,199,255,0.5);
+  --card-hover: rgba(255,42,59,0.08);
+  --shadow-sm: 0 8px 20px rgba(0,0,0,0.4);
+  --shadow-glow: 0 0 30px var(--accentGlow);
+  --toast-bg: #1f1f1f;
+  --safe-top: env(safe-area-inset-top);
+  --safe-bottom: env(safe-area-inset-bottom);
+  --safe-left: env(safe-area-inset-left);
+  --safe-right: env(safe-area-inset-right);
+}
+body.theme-light {
+  --bg: #f7f5f2; --surface: #ffffff; --surface2: #faf8f5; --surface3: #f0ede8;
+  --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.16);
+  --accent: #d4163c; --accent2: #ff4466; --accentGlow: rgba(212,22,60,0.18); --accentGlow2: rgba(80,60,200,0.12);
+  --red: #d4163c; --blue: #1a6fe8; --green: #00a86b; --amber: #d48a00;
+  --text: #1a1a2e; --muted: #808090; --muted2: #444458;
+  --dub-color: #d4163c; --dub-bg: rgba(212,22,60,0.07); --dub-border: rgba(212,22,60,0.35);
+  --sub-color: #1a6fe8; --sub-bg: rgba(26,111,232,0.07); --sub-border: rgba(26,111,232,0.35);
+  --card-hover: rgba(212,22,60,0.04); --shadow-sm: 0 4px 16px rgba(0,0,0,0.07);
+  --shadow-glow: 0 0 20px var(--accentGlow); --toast-bg: #ffffff;
+}
+body.theme-azure {
+  --bg: #05101e; --surface: #091828; --surface2: #102235; --surface3: #162e45;
+  --border: rgba(30,180,255,0.1); --border2: rgba(30,180,255,0.2);
+  --accent: #00c8ff; --accent2: #60e0ff; --accentGlow: rgba(0,200,255,0.3); --accentGlow2: rgba(0,100,180,0.3);
+  --red: #ff5c7a; --blue: #00c8ff; --green: #00ffb3; --amber: #ffcb47;
+  --text: #d8f0ff; --muted: #3a6080; --muted2: #7ab0cc;
+  --dub-color: #ff7a5c; --dub-bg: rgba(255,122,92,0.12); --dub-border: rgba(255,122,92,0.45);
+  --sub-color: #00e5d4; --sub-bg: rgba(0,229,212,0.12); --sub-border: rgba(0,229,212,0.45);
+  --card-hover: rgba(0,200,255,0.06); --shadow-sm: 0 8px 24px rgba(0,0,0,0.6);
+  --shadow-glow: 0 0 30px var(--accentGlow); --toast-bg: #091828;
+}
+body.theme-purple {
+  --bg: #0c0612; --surface: #140c1e; --surface2: #1c1228; --surface3: #261a38;
+  --border: rgba(180,100,255,0.1); --border2: rgba(180,100,255,0.2);
+  --accent: #c060ff; --accent2: #e090ff; --accentGlow: rgba(192,96,255,0.4); --accentGlow2: rgba(255,80,180,0.25);
+  --red: #ff6090; --blue: #70c0ff; --green: #80ffb0; --amber: #ffd060;
+  --text: #f0e4ff; --muted: #6040a0; --muted2: #b090d0;
+  --dub-color: #ff8060; --dub-bg: rgba(255,128,96,0.15); --dub-border: rgba(255,128,96,0.5);
+  --sub-color: #70c0ff; --sub-bg: rgba(112,192,255,0.12); --sub-border: rgba(112,192,255,0.5);
+  --card-hover: rgba(192,96,255,0.07); --shadow-sm: 0 8px 32px rgba(0,0,0,0.6);
+  --shadow-glow: 0 0 35px var(--accentGlow); --toast-bg: #140c1e;
+}
+body.theme-amber {
+  --bg: #0e0800; --surface: #181000; --surface2: #231800; --surface3: #302200;
+  --border: rgba(255,180,60,0.1); --border2: rgba(255,180,60,0.2);
+  --accent: #ff9f00; --accent2: #ffc840; --accentGlow: rgba(255,159,0,0.4); --accentGlow2: rgba(255,80,0,0.3);
+  --red: #ff5040; --blue: #80c8ff; --green: #c0ff80; --amber: #ffc840;
+  --text: #fff4e0; --muted: #806020; --muted2: #d0a040;
+  --dub-color: #ff7040; --dub-bg: rgba(255,112,64,0.15); --dub-border: rgba(255,112,64,0.5);
+  --sub-color: #80c8ff; --sub-bg: rgba(128,200,255,0.12); --sub-border: rgba(128,200,255,0.5);
+  --card-hover: rgba(255,159,0,0.08); --shadow-sm: 0 8px 28px rgba(0,0,0,0.6);
+  --shadow-glow: 0 0 35px var(--accentGlow); --toast-bg: #181000;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Nunito', sans-serif;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  overflow-x: hidden;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Ambient orbs */
+body::before {
+  content: '';
+  position: fixed;
+  top: -150px; left: -80px;
+  width: 380px; height: 380px;
+  background: radial-gradient(circle, var(--accentGlow) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+  animation: orbDrift 18s ease-in-out infinite alternate;
+}
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -100px; right: -60px;
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, var(--accentGlow2) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+  animation: orbDrift 22s ease-in-out infinite alternate-reverse;
+}
+@keyframes orbDrift {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(24px, 18px) scale(1.08); }
+}
+
+/* ===== TOP HEADER (logo + actions) ===== */
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  /* Safe area: push content down below Dynamic Island */
+  padding: 0 16px;
+  padding-top: env(safe-area-inset-top);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  backdrop-filter: blur(28px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+}
+
+.top-bar-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; min-height: 54px;
+}
+
+.logo {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 1.05rem; font-weight: 900;
+  letter-spacing: -0.03em;
+}
+.logo-icon {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800;
+  box-shadow: 0 0 18px var(--accentGlow), 0 2px 6px rgba(0,0,0,0.4);
+  animation: logoPulse 3s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes logoPulse {
+  0%,100% { box-shadow: 0 0 16px var(--accentGlow), 0 2px 6px rgba(0,0,0,0.4); }
+  50%      { box-shadow: 0 0 28px var(--accentGlow), 0 2px 6px rgba(0,0,0,0.4); }
+}
+.logo-text span { color: var(--accent2); }
+
+.hdr-actions {
+  display: flex; gap: 6px; align-items: center;
+}
+.icon-btn {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--muted2);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+  -webkit-appearance: none;
+  position: relative;
+}
+.icon-btn:active { transform: scale(0.93); background: var(--surface3); }
+
+/* Theme select disguised as icon */
+.theme-btn-wrap {
+  position: relative;
+  width: 36px; height: 36px;
+}
+.theme-selector {
+  position: absolute; inset: 0;
+  opacity: 0; width: 100%; height: 100%;
+  cursor: pointer; z-index: 2;
+  -webkit-appearance: none;
+}
+.theme-btn-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--muted2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+
+.sync-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--muted); position: absolute; top: 6px; right: 6px;
+  transition: background 0.2s;
+}
+.sync-dot.ok  { background: var(--green); box-shadow: 0 0 5px var(--green); }
+.sync-dot.err { background: var(--red); box-shadow: 0 0 4px var(--red); }
+.sync-dot.syncing { background: var(--amber); animation: pulse 0.9s infinite; }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.35; } }
+@keyframes spin   { to { transform: rotate(360deg); } }
+.icon-btn.syncing .sync-icon { display: inline-block; animation: spin 1s linear infinite; }
+
+/* ===== BOTTOM NAV ===== */
+.bottom-nav {
+  position: fixed !important;
+  bottom: 0;
+  left: 0; right: 0;
+  z-index: 9000;
+  padding: 4px 12px calc(var(--safe-bottom) + 4px);
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  backdrop-filter: blur(28px) saturate(160%);
+  border-top: 1px solid var(--border);
+  display: flex; gap: 4px; justify-content: space-around;
+  will-change: transform;
+}
+.tab-btn {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  background: none; border: none;
+  color: var(--muted);
+  padding: 5px 4px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: all 0.22s cubic-bezier(0.34,1.4,0.64,1);
+  -webkit-appearance: none;
+}
+.tab-btn .tab-icon {
+  font-size: 1rem;
+  transition: transform 0.22s cubic-bezier(0.34,1.4,0.64,1);
+}
+.tab-btn.active {
+  color: var(--accent2);
+  background: var(--accentGlow2);
+}
+.tab-btn.active .tab-icon { transform: scale(1.15) translateY(-1px); }
+.tab-btn:active { transform: scale(0.94); }
+
+/* ===== MAIN CONTENT ===== */
+main {
+  position: relative; z-index: 1;
+  padding: 14px 14px 0;
+  padding-bottom: calc(56px + var(--safe-bottom));
+  max-width: 480px;
+  margin: 0 auto;
+}
+.section { display: none; animation: fadeUp 0.28s cubic-bezier(0.2,0.8,0.3,1); }
+.section.active { display: block; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== ADD PANEL ===== */
+.add-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 14px 14px 16px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-sm);
+  position: relative; overflow: hidden;
+  transition: box-shadow 0.3s;
+}
+.add-panel:focus-within {
+  box-shadow: var(--shadow-sm), 0 0 0 1px var(--accent), 0 0 22px var(--accentGlow);
+}
+.add-panel::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--blue), transparent);
+  border-radius: 20px 20px 0 0;
+}
+.panel-title {
+  font-size: 0.62rem; font-weight: 700;
+  color: var(--muted); letter-spacing: 0.12em;
+  text-transform: uppercase; margin-bottom: 12px;
+}
+.form-col { display: flex; flex-direction: column; gap: 10px; }
+.form-row-2 { display: flex; gap: 10px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; flex: 1; }
+.form-group label {
+  font-size: 0.6rem; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.09em; font-weight: 700;
+}
+.form-group input,
+.form-group select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 12px 13px;
+  border-radius: 12px;
+  outline: none;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem; font-weight: 500;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+  width: 100%;
+}
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accentGlow);
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+input[type="number"] { -moz-appearance: textfield; }
+
+.btn {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none; color: white;
+  padding: 13px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700; font-size: 0.88rem;
+  transition: all 0.22s cubic-bezier(0.34,1.4,0.64,1);
+  box-shadow: 0 4px 16px var(--accentGlow);
+  width: 100%;
+  -webkit-appearance: none;
+}
+.btn:active { transform: scale(0.97); box-shadow: 0 2px 8px var(--accentGlow); }
+.btn-ghost {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  box-shadow: none;
+}
+.btn-ghost:active { box-shadow: none; border-color: var(--accent); }
+.btn-sm { padding: 9px 16px; font-size: 0.78rem; width: auto; }
+
+/* ===== STATS BAR ===== */
+.stats-bar {
+  display: flex; gap: 6px;
+  overflow-x: auto; padding-bottom: 4px;
+  margin-bottom: 12px;
+  scrollbar-width: none;
+}
+.stats-bar::-webkit-scrollbar { display: none; }
+.stat-pill {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 6px 12px;
+  font-size: 0.69rem;
+  color: var(--muted2);
+  display: flex; align-items: center; gap: 6px;
+  font-weight: 600; white-space: nowrap;
+  flex-shrink: 0;
+  font-family: 'Nunito', sans-serif;
+}
+.stat-pill strong { color: var(--text); font-weight: 800; }
+.stat-pill .dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 4px var(--accent);
+  flex-shrink: 0;
+}
+.stat-pill .dot.red   { background: var(--red);   box-shadow: 0 0 4px var(--red); }
+.stat-pill .dot.green { background: var(--green); box-shadow: 0 0 4px var(--green); }
+.stat-pill .dot.blue  { background: var(--blue);  box-shadow: 0 0 4px var(--blue); }
+.stat-pill .dot.amber { background: var(--amber); box-shadow: 0 0 4px var(--amber); }
+
+/* ===== SECTION HEADER ===== */
+.sec-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px; gap: 8px;
+}
+.sec-title { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.04em; }
+.sec-btns { display: flex; gap: 6px; flex-shrink: 0; }
+
+/* ===== CATALOG — single column on mobile ===== */
+.catalog-col {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 12px;
+}
+.catalog-col.col-dub { border-top: 2px solid var(--dub-border); }
+.catalog-col.col-sub { border-top: 2px solid var(--sub-border); }
+
+.column-header {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.column-title { display: flex; align-items: center; gap: 8px; }
+.column-title h3 { font-size: 0.85rem; font-weight: 800; letter-spacing: -0.02em; }
+
+.badge {
+  padding: 3px 9px;
+  border-radius: 7px;
+  font-size: 0.6rem; font-weight: 700;
+  letter-spacing: 0.1em;
+  font-family: 'JetBrains Mono', monospace;
+}
+.badge.dub { background: var(--dub-bg); color: var(--dub-color); border: 1px solid var(--dub-border); }
+.badge.sub { background: var(--sub-bg); color: var(--sub-color); border: 1px solid var(--sub-border); }
+.badge.dropped {
+  background: rgba(120,120,120,0.12); color: var(--muted2);
+  border: 1px solid rgba(120,120,120,0.3);
+}
+.count-badge {
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  padding: 2px 9px;
+  border-radius: 40px;
+  font-size: 0.66rem; font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ===== CATALOG ITEMS ===== */
+.list { padding: 2px 0; }
+.item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(128,128,128,0.05);
+  position: relative;
+  transition: background 0.15s;
+}
+.item:last-child { border-bottom: none; }
+.item-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem; color: var(--muted2);
+  width: 20px; text-align: right; flex-shrink: 0;
+}
+.item-title { flex: 1; font-size: 0.83rem; font-weight: 700; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item-eps {
+  color: var(--muted); font-size: 0.66rem;
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--surface3);
+  padding: 2px 7px; border-radius: 16px;
+  flex-shrink: 0;
+}
+/* On mobile: always show actions */
+.item-actions { display: flex; gap: 5px; flex-shrink: 0; }
+.item-btn {
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  color: var(--muted2);
+  width: 34px; height: 34px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.18s;
+  flex-shrink: 0;
+  -webkit-appearance: none;
+}
+.item-btn:active {
+  background: var(--accent); color: white;
+  border-color: var(--accent);
+  transform: scale(0.92);
+}
+.item-btn.danger:active { background: var(--red); border-color: var(--red); }
+
+/* Edit dropdown on mobile — slides up from bottom as sheet */
+.edit-dropdown {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  background: var(--surface2);
+  border-top: 1px solid var(--border2);
+  border-radius: 24px 24px 0 0;
+  padding: 20px 18px calc(var(--safe-bottom) + 20px);
+  z-index: 9050;
+  display: none;
+  animation: slideUp 0.22s cubic-bezier(0.34,1.2,0.64,1);
+  box-shadow: 0 -16px 50px rgba(0,0,0,0.5);
+}
+.edit-dropdown::before {
+  content: '';
+  display: block;
+  width: 36px; height: 4px;
+  background: var(--border2);
+  border-radius: 2px;
+  margin: 0 auto 16px;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.edit-dropdown.open { display: block; }
+.edit-field {
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 12px 13px;
+  border-radius: 11px;
+  font-size: 0.9rem;
+  width: 100%;
+  margin-bottom: 8px;
+  font-family: 'Nunito', sans-serif;
+  outline: none;
+  -webkit-appearance: none;
+  transition: border-color 0.2s;
+}
+.edit-field:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accentGlow); }
+.edit-label {
+  font-size: 0.6rem; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.1em;
+  font-weight: 700; margin-bottom: 4px; display: block;
+}
+.edit-save-btn {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none; color: white;
+  padding: 13px 14px; border-radius: 12px;
+  cursor: pointer; font-size: 0.88rem; font-weight: 700;
+  width: 100%; font-family: 'Nunito', sans-serif;
+  -webkit-appearance: none;
+}
+.edit-sheet-title {
+  font-size: 0.75rem; font-weight: 700; color: var(--muted2);
+  text-transform: uppercase; letter-spacing: 0.1em;
+  margin-bottom: 14px; text-align: center;
+}
+.sheet-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 490;
+  display: none;
+}
+.sheet-overlay.open { display: block; }
+
+/* ===== EMPTY STATE ===== */
+.empty {
+  padding: 2.5rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+.empty-icon { font-size: 1.8rem; margin-bottom: 0.5rem; opacity: 0.35; }
+
+/* ===== SEARCH ROW ===== */
+.search-row { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.search-input {
+  flex: 1; min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 11px 16px;
+  border-radius: 26px;
+  font-size: 0.84rem;
+  color: var(--text);
+  font-family: 'Nunito', sans-serif;
+  outline: none;
+  -webkit-appearance: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accentGlow); }
+.sort-select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  border-radius: 26px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.66rem; color: var(--text);
+  cursor: pointer; outline: none;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+  transition: border-color 0.2s;
+  max-width: 110px;
+}
+.sort-select:focus { border-color: var(--accent); }
+
+/* ===== EP FILTER ===== */
+.ep-filter-row { display: flex; gap: 7px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+.ep-filter-label { font-size: 0.64rem; color: var(--muted2); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; flex-shrink: 0; }
+.ep-filter-input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 22px;
+  font-size: 0.82rem;
+  width: 80px;
+  outline: none; -webkit-appearance: none;
+  font-family: 'JetBrains Mono', monospace;
+  transition: border-color 0.2s;
+}
+.ep-filter-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accentGlow); }
+.ep-filter-clear {
+  background: var(--surface3); border: 1px solid var(--border);
+  color: var(--muted2); padding: 7px 11px; border-radius: 22px;
+  font-size: 0.72rem; cursor: pointer; font-weight: 600;
+  -webkit-appearance: none;
+}
+.ep-filter-clear:active { border-color: var(--accent); color: var(--accent2); }
+.ep-filter-badge {
+  background: var(--accentGlow2); border: 1px solid var(--accent);
+  color: var(--accent2); padding: 3px 9px; border-radius: 18px;
+  font-size: 0.66rem; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+  display: none;
+}
+.ep-filter-badge.active { display: inline-block; }
+
+/* ===== ROADMAP & COMPLETED ITEMS ===== */
+.roadmap, .completed-grid { display: flex; flex-direction: column; gap: 8px; }
+
+.rm-item, .completed-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 13px 14px;
+  display: flex; align-items: flex-start; gap: 10px;
+  transition: border-color 0.2s;
+  cursor: default; position: relative; overflow: hidden;
+}
+.rm-item::before, .completed-item::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: transparent; transition: background 0.25s;
+}
+.rm-item.watching {
+  background: rgba(232,25,90,0.06);
+  border-color: rgba(232,25,90,0.28);
+  box-shadow: 0 0 0 1px rgba(232,25,90,0.1);
+}
+.rm-item.watching::before { background: var(--accent); }
+
+.rm-num, .c-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500; font-size: 0.7rem;
+  color: var(--muted2); min-width: 26px; opacity: 0.7;
+  padding-top: 2px; flex-shrink: 0;
+}
+.rm-info, .c-info { flex: 1; min-width: 0; }
+.rm-name, .c-title {
+  font-weight: 800; font-size: 0.88rem;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+.rm-meta, .c-meta {
+  font-size: 0.62rem; color: var(--muted2);
+  margin-top: 2px; font-family: 'JetBrains Mono', monospace;
+}
+
+/* Progress row — full width block under title */
+.progress-row {
+  display: flex; flex-direction: column; gap: 8px;
+  margin-top: 10px; width: 100%;
+}
+.progress-bar { width: 100%; height: 4px; background: var(--surface3); border-radius: 9px; overflow: hidden; }
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  transition: width 0.4s cubic-bezier(0.34,1.2,0.64,1);
+  border-radius: 9px; box-shadow: 0 0 6px var(--accentGlow);
+}
+.ep-stepper { display: flex; align-items: center; gap: 6px; }
+.ep-stepper-row { display: flex; align-items: center; gap: 8px; }
+.step-btn {
+  background: var(--surface3);
+  border: 1px solid var(--border2);
+  color: var(--accent2);
+  width: 36px; height: 36px;
+  border-radius: 9px; cursor: pointer;
+  font-size: 1.1rem; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  -webkit-appearance: none;
+  user-select: none; flex-shrink: 0;
+}
+.step-btn:active { background: var(--accent); border-color: var(--accent); color: white; transform: scale(0.92); }
+.ep-input {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text); width: 52px;
+  padding: 6px 4px; border-radius: 9px;
+  font-family: 'JetBrains Mono', monospace; text-align: center;
+  font-size: 0.82rem; -webkit-appearance: none;
+  transition: border-color 0.2s;
+}
+.ep-input:focus { border-color: var(--accent); outline: none; }
+.progress-num { font-family: 'JetBrains Mono', monospace; font-size: 0.66rem; color: var(--muted); }
+
+/* Always-visible actions on mobile — single menu button */
+.rm-actions, .c-actions {
+  display: flex; gap: 5px; flex-shrink: 0;
+}
+
+/* ===== ACTION SHEET (bottom sheet for rm/completed/catalog items) ===== */
+.action-sheet {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  background: var(--surface2);
+  border-top: 1px solid var(--border2);
+  border-radius: 26px 26px 0 0;
+  padding: 0 0 calc(var(--safe-bottom) + 8px);
+  z-index: 9100;
+  display: none;
+  box-shadow: 0 -20px 60px rgba(0,0,0,0.55);
+}
+.action-sheet.open { display: block; animation: slideUp 0.24s cubic-bezier(0.34,1.2,0.64,1); }
+.action-sheet-handle {
+  width: 38px; height: 4px; background: var(--border2);
+  border-radius: 2px; margin: 14px auto 0;
+}
+.action-sheet-title {
+  font-size: 0.82rem; font-weight: 800; color: var(--text);
+  padding: 14px 20px 4px;
+  line-height: 1.35; word-break: break-word;
+}
+.action-sheet-sub {
+  font-size: 0.65rem; color: var(--muted2);
+  font-family: 'JetBrains Mono', monospace;
+  padding: 0 20px 12px;
+}
+.action-sheet-divider {
+  height: 1px; background: var(--border); margin: 0 16px 6px;
+}
+.action-sheet-btn {
+  display: flex; align-items: center; gap: 14px;
+  width: 100%; padding: 15px 20px;
+  background: none; border: none;
+  color: var(--text); font-family: 'Nunito', sans-serif;
+  font-size: 0.92rem; font-weight: 600;
+  cursor: pointer; text-align: left;
+  transition: background 0.12s;
+  -webkit-appearance: none;
+}
+.action-sheet-btn:active { background: var(--surface3); }
+.action-sheet-btn .asb-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+.action-sheet-btn.red { color: var(--red); }
+.action-sheet-btn.green { color: var(--green); }
+.action-sheet-btn.blue { color: var(--blue); }
+.action-sheet-btn.amber { color: var(--amber); }
+.asb-icon.red-bg { background: rgba(255,59,74,0.15); }
+.asb-icon.green-bg { background: rgba(46,232,165,0.15); }
+.asb-icon.blue-bg { background: rgba(45,158,255,0.15); }
+.asb-icon.amber-bg { background: rgba(255,170,51,0.15); }
+.asb-icon.gray-bg { background: var(--surface3); }
+
+/* Menu trigger button on rm-items */
+.menu-btn {
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  color: var(--muted2);
+  width: 34px; height: 34px;
+  border-radius: 9px; cursor: pointer;
+  font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center;
+  -webkit-appearance: none; flex-shrink: 0;
+  margin-top: 1px;
+}
+.menu-btn:active { background: var(--accent); color: white; border-color: var(--accent); transform: scale(0.92); }
+
+/* Watching tag */
+.watching-tag {
+  font-size: 0.55rem; font-weight: 700;
+  color: var(--accent2);
+  background: rgba(232,25,90,0.12);
+  border: 1px solid rgba(232,25,90,0.25);
+  padding: 3px 8px; border-radius: 28px;
+  letter-spacing: 0.07em; text-transform: uppercase;
+  animation: watchPulse 2s ease-in-out infinite;
+  white-space: nowrap;
+}
+@keyframes watchPulse {
+  0%,100% { box-shadow: 0 0 0px var(--accentGlow); }
+  50%      { box-shadow: 0 0 7px var(--accentGlow); }
+}
+
+/* Check mark */
+.check-mark {
+  background: rgba(0,229,160,0.12);
+  border: 1px solid rgba(0,229,160,0.28);
+  border-radius: 50%;
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--green); font-size: 0.8rem; flex-shrink: 0;
+}
+
+/* Drag handle */
+.drag-handle {
+  cursor: grab; color: var(--muted); font-size: 1.1rem;
+  opacity: 0.5; transition: 0.15s; user-select: none;
+  padding: 4px 5px; border-radius: 6px;
+  flex-shrink: 0;
+  touch-action: none;
+}
+.drag-handle:active { cursor: grabbing; opacity: 0.9; background: var(--surface3); }
+
+/* Reorder buttons */
+.reorder-btns { display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
+.reorder-btn {
+  background: var(--surface3); border: 1px solid var(--border);
+  color: var(--muted2); width: 28px; height: 26px;
+  border-radius: 7px; cursor: pointer; font-size: 0.72rem; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  -webkit-appearance: none; user-select: none;
+}
+.reorder-btn:active { background: var(--accent); border-color: var(--accent); color: white; transform: scale(0.92); }
+
+/* Section label */
+.section-label {
+  font-size: 0.62rem; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.1em;
+  padding: 0 2px;
+  display: flex; align-items: center; gap: 8px;
+  margin: 10px 0 6px;
+}
+.section-label::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--border2), transparent);
+}
+
+/* ===== DRAG GHOST ===== */
+.drag-ghost {
+  border-radius: 16px;
+  border: 2px dashed var(--accent) !important;
+  background: var(--card-hover) !important;
+  opacity: 0.6; flex-shrink: 0;
+}
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.85);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  z-index: 9200; display: none;
+  align-items: flex-end; justify-content: center;
+  padding: 0 0 var(--safe-bottom);
+}
+.modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 28px 28px 0 0;
+  padding: 24px 20px calc(24px + var(--safe-bottom));
+  width: 100%;
+  box-shadow: 0 -20px 60px rgba(0,0,0,0.5);
+  animation: slideUp 0.28s cubic-bezier(0.34,1.2,0.64,1);
+}
+.modal::before {
+  content: '';
+  display: block; width: 36px; height: 4px;
+  background: var(--border2); border-radius: 2px;
+  margin: 0 auto 18px;
+}
+.radio-label {
+  display: flex; gap: 9px; align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 13px; padding: 13px 14px; margin-bottom: 7px;
+  cursor: pointer; transition: border-color 0.15s, background 0.15s;
+  font-size: 0.88rem;
+}
+.radio-label:active { border-color: var(--accent); background: var(--card-hover); }
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed;
+  bottom: calc(56px + var(--safe-bottom) + 10px);
+  left: 14px; right: 14px;
+  background: var(--toast-bg);
+  border: 1px solid var(--border2);
+  border-left: 3px solid var(--accent);
+  border-radius: 14px;
+  padding: 13px 18px;
+  font-weight: 600; font-size: 0.84rem;
+  z-index: 999; opacity: 0;
+  text-align: center;
+  transform: translateY(10px) scale(0.96);
+  transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events: none;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.3);
+}
+.toast.show { opacity: 1; transform: translateY(0) scale(1); }
+.toast.success { border-left-color: var(--green); }
+.toast.error   { border-left-color: var(--red); }
+
+/* ===== EDIT MODAL (popup centrato) ===== */
+.edit-modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  z-index: 9300; display: none;
+  align-items: center; justify-content: center;
+  padding: 20px;
+}
+.edit-modal-overlay.open { display: flex; animation: fadeIn 0.18s ease; }
+.edit-modal {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 24px;
+  padding: 22px 20px 20px;
+  width: 100%; max-width: 420px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+  animation: scaleIn 0.22s cubic-bezier(0.34,1.3,0.64,1);
+  max-height: 90vh; overflow-y: auto;
+}
+@keyframes scaleIn {
+  from { opacity:0; transform: scale(0.93); }
+  to   { opacity:1; transform: scale(1); }
+}
+.edit-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 18px;
+}
+.edit-modal-title {
+  font-size: 0.82rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted2);
+}
+.edit-modal-close {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: var(--surface3); border: 1px solid var(--border);
+  color: var(--muted2); cursor: pointer; font-size: 0.8rem;
+  display: flex; align-items: center; justify-content: center;
+  -webkit-appearance: none;
+}
+.edit-modal-close:active { background: var(--red); color: white; }
+.edit-modal-field { margin-bottom: 12px; }
+.edit-modal-label {
+  font-size: 0.6rem; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.1em;
+  font-weight: 700; margin-bottom: 5px; display: block;
+}
+.edit-modal-input {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 12px 13px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  width: 100%;
+  font-family: 'Nunito', sans-serif;
+  outline: none; -webkit-appearance: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.edit-modal-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accentGlow); }
+.edit-modal-textarea {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 12px 13px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  width: 100%; min-height: 76px;
+  font-family: 'Nunito', sans-serif;
+  outline: none; resize: vertical;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.edit-modal-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accentGlow); }
+.edit-modal-row { display: flex; gap: 10px; }
+.edit-modal-row .edit-modal-field { flex: 1; }
+.edit-modal-actions { display: flex; gap: 8px; margin-top: 4px; }
+.edit-modal-save {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none; color: white;
+  padding: 13px; border-radius: 12px;
+  cursor: pointer; font-size: 0.88rem; font-weight: 700;
+  flex: 1; font-family: 'Nunito', sans-serif;
+  -webkit-appearance: none; transition: transform 0.15s;
+}
+.edit-modal-save:active { transform: scale(0.97); }
+.edit-modal-cancel {
+  background: var(--surface2); border: 1px solid var(--border2);
+  color: var(--muted2);
+  padding: 13px 18px; border-radius: 12px;
+  cursor: pointer; font-size: 0.88rem; font-weight: 600;
+  font-family: 'Nunito', sans-serif; -webkit-appearance: none;
+}
+.edit-modal-cancel:active { border-color: var(--accent); color: var(--accent2); }
+
+/* ===== STYLED CHECKBOX ===== */
+.toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 11px 13px;
+}
+.toggle-label-text { font-size: 0.88rem; font-weight: 600; }
+.toggle-switch {
+  width: 42px; height: 24px; border-radius: 12px;
+  background: var(--surface3); border: 1px solid var(--border2);
+  position: relative; cursor: pointer; transition: background 0.2s;
+  flex-shrink: 0;
+}
+.toggle-switch.on { background: var(--accent); border-color: var(--accent); }
+.toggle-switch::after {
+  content: '';
+  position: absolute; top: 3px; left: 3px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--muted); transition: transform 0.2s, background 0.2s;
+}
+.toggle-switch.on::after { transform: translateX(18px); background: white; }
+
+/* ===== CATALOG ITEM TAGS ===== */
+.item-body { flex: 1; min-width: 0; }
+.item-title { font-size: 0.83rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item-notes-row { font-size: 0.65rem; color: var(--muted); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
+.item-tag {
+  font-size: 0.56rem; font-weight: 700; letter-spacing: 0.05em;
+  padding: 2px 7px; border-radius: 20px;
+  white-space: nowrap;
+}
+.item-tag.ongoing {
+  color: var(--green); background: rgba(46,232,165,0.12);
+  border: 1px solid rgba(46,232,165,0.3);
+  animation: watchPulse 2s ease-in-out infinite;
+}
+.item-tag.films {
+  color: var(--blue); background: rgba(45,158,255,0.12);
+  border: 1px solid rgba(45,158,255,0.3);
+}
+
+/* ===== ADD BUTTON (replaces inline form) ===== */
+.add-btn {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none; color: white;
+  padding: 10px 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700; font-size: 0.82rem;
+  display: flex; align-items: center; gap: 6px;
+  transition: all 0.22s cubic-bezier(0.34,1.4,0.64,1);
+  box-shadow: 0 4px 14px var(--accentGlow);
+  flex-shrink: 0;
+  -webkit-appearance: none;
+}
+.add-btn:active { transform: scale(0.95); box-shadow: 0 2px 8px var(--accentGlow); }
+
+/* ===== POPUP MODAL (centered, for add forms) ===== */
+.popup-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.82);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  z-index: 9400; display: none;
+  align-items: center; justify-content: center;
+  padding: 20px 16px;
+}
+.popup-overlay.open { display: flex; animation: fadeIn 0.18s ease; }
+.popup-box {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 24px;
+  padding: 22px 20px 20px;
+  width: 100%; max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px var(--border);
+  animation: popIn 0.22s cubic-bezier(0.34,1.3,0.64,1);
+  max-height: 90vh; overflow-y: auto;
+}
+@keyframes popIn {
+  from { opacity:0; transform: scale(0.92) translateY(12px); }
+  to   { opacity:1; transform: scale(1) translateY(0); }
+}
+.popup-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.popup-title {
+  font-size: 1rem; font-weight: 800; letter-spacing: -0.02em;
+}
+.popup-close {
+  background: var(--surface3); border: 1px solid var(--border2);
+  color: var(--muted2); width: 32px; height: 32px;
+  border-radius: 9px; cursor: pointer; font-size: 0.88rem;
+  display: flex; align-items: center; justify-content: center;
+  -webkit-appearance: none;
+}
+.popup-close:active { background: var(--red); color: white; border-color: var(--red); }
+.popup-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+.popup-label {
+  font-size: 0.6rem; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.09em; font-weight: 700;
+}
+.popup-input, .popup-select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 12px 13px;
+  border-radius: 12px;
+  outline: none;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem; font-weight: 500;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+  width: 100%;
+}
+.popup-input:focus, .popup-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accentGlow);
+}
+.popup-row { display: flex; gap: 10px; }
+.popup-row .popup-field { flex: 1; }
+.popup-actions { display: flex; gap: 8px; margin-top: 14px; }
+.popup-save {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none; color: white;
+  padding: 13px 14px; border-radius: 12px;
+  cursor: pointer; font-size: 0.88rem; font-weight: 700;
+  flex: 1; font-family: 'Nunito', sans-serif;
+  -webkit-appearance: none;
+  transition: all 0.2s;
+}
+.popup-save:active { transform: scale(0.97); }
+.popup-cancel {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: 13px 14px; border-radius: 12px;
+  cursor: pointer; font-size: 0.88rem; font-weight: 600;
+  font-family: 'Nunito', sans-serif; -webkit-appearance: none;
+}
+.popup-cancel:active { border-color: var(--accent); color: var(--accent2); }
+
+/* ===== FILM TAGS ===== */
+.film-tag {
+  font-size: 0.56rem; font-weight: 700; letter-spacing: 0.05em;
+  padding: 2px 7px; border-radius: 20px;
+  white-space: nowrap;
+}
+.film-tag.standalone {
+  color: var(--amber); background: rgba(255,170,51,0.15);
+  border: 1px solid rgba(255,170,51,0.35);
+  box-shadow: 0 0 6px rgba(255,170,51,0.12);
+}
+.film-tag.da-serie {
+  color: var(--blue); background: rgba(45,158,255,0.15);
+  border: 1px solid rgba(45,158,255,0.35);
+  box-shadow: 0 0 6px rgba(45,158,255,0.15);
+}
+
+/* Film items inside saga blocks get subtle hover */
+.film-saga-block .rm-item {
+  transition: background 0.2s, transform 0.15s;
+  cursor: default;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  padding: 13px 16px;
+  background: transparent;
+}
+.film-saga-block .rm-item:last-child {
+  border-bottom: none;
+}
+.film-saga-block .rm-item:hover {
+  background: var(--card-hover);
+}
+.film-saga-block .rm-item::before {
+  display: none;
+}
+.film-serie-name {
+  font-size: 0.64rem; 
+  color: var(--muted2);
+  margin-top: 3px; 
+  font-family: 'Nunito', sans-serif;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+  border-top: 1px solid rgba(128,128,128,0.08);
+  padding-top: 6px;
+  margin-top: 6px;
+}
+
+/* ===== FILM COMPLETED ITEM ===== */
+.film-completed-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--green);
+  border-radius: 16px;
+  padding: 13px 14px;
+  display: flex; align-items: flex-start; gap: 10px;
+  transition: border-color 0.2s, background 0.2s;
+  cursor: default; 
+  position: relative; 
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.film-completed-item:hover {
+  background: rgba(46,232,165,0.03);
+}
+
+</style>
+<style>
+/* ===== SETTINGS DROPDOWN ===== */
+.settings-wrap { position: relative; }
+.settings-dropdown {
+  position: absolute; top: calc(100% + 8px); right: 0;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  padding: 6px;
+  min-width: 180px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  z-index: 9500;
+  display: none;
+  animation: popIn 0.18s cubic-bezier(0.34,1.3,0.64,1);
+}
+.settings-dropdown.open { display: block; }
+.settings-dropdown-btn {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; padding: 11px 12px;
+  background: none; border: none;
+  color: var(--text); font-family: 'Nunito', sans-serif;
+  font-size: 0.84rem; font-weight: 600;
+  cursor: pointer; border-radius: 10px;
+  text-align: left; -webkit-appearance: none;
+  transition: background 0.12s;
+}
+.settings-dropdown-btn:active { background: var(--surface3); }
+.settings-dropdown-btn .sdb-icon { font-size: 1rem; flex-shrink: 0; }
+.settings-dropdown-divider { height: 1px; background: var(--border); margin: 4px 6px; }
+
+/* ===== FILM SAGA MANAGER POPUP ===== */
+.saga-manager-list { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; max-height: 260px; overflow-y: auto; }
+.saga-manager-item {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 9px 12px;
+}
+.saga-manager-title { flex: 1; font-size: 0.85rem; font-weight: 700; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.saga-manager-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem; color: var(--muted2);
+  background: var(--surface3); border: 1px solid var(--border);
+  padding: 2px 8px; border-radius: 20px; flex-shrink: 0;
+}
+.saga-manager-count.full { color: var(--green); border-color: var(--green); background: rgba(46,232,165,0.1); }
+.saga-manager-remove {
+  background: none; border: none; color: var(--muted);
+  cursor: pointer; font-size: 0.9rem; padding: 3px;
+  border-radius: 6px; flex-shrink: 0;
+  -webkit-appearance: none;
+  transition: color 0.15s;
+}
+.saga-manager-remove:active { color: var(--red); }
+
+/* Film order badge */
+.film-order-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem; font-weight: 800;
+  color: white;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 2px 8px; border-radius: 14px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px var(--accentGlow), inset 0 1px 0 rgba(255,255,255,0.25);
+  letter-spacing: 0.02em;
+}
+
+/* Film saga section block */
+.film-saga-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-sm), 0 0 0 1px var(--border) inset;
+  position: relative;
+}
+.film-saga-header {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, var(--surface2), var(--surface3));
+  font-size: 0.78rem; font-weight: 800;
+  color: var(--text); 
+  letter-spacing: 0.02em;
+  display: flex; align-items: center; gap: 8px;
+  position: relative;
+}
+.film-saga-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+  opacity: 0.3;
+}
+.film-saga-header .saga-type-badge {
+  font-size: 0.6rem; 
+  padding: 2px 8px; 
+  border-radius: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-left: auto;
+}
+.film-saga-header .saga-type-badge.anime { 
+  color: var(--blue); 
+  background: rgba(45,158,255,0.15); 
+  border: 1px solid rgba(45,158,255,0.4);
+  box-shadow: 0 0 8px rgba(45,158,255,0.2);
+}
+.film-saga-header .saga-type-badge.film { 
+  color: var(--amber); 
+  background: rgba(255,170,51,0.15); 
+  border: 1px solid rgba(255,170,51,0.4);
+  box-shadow: 0 0 8px rgba(255,170,51,0.2);
+}
+</style>
+</head>
+<body class="theme-dark">
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-bar-inner">
+    <div class="logo">
+      <div class="logo-icon">ST</div>
+      <div class="logo-text">Serie<span>Tracker</span></div>
+    </div>
+  <div class="hdr-actions">
+    <div class="theme-btn-wrap" title="Tema">
+      <div class="theme-btn-icon">🎨</div>
+      <select class="theme-selector" id="themeSelect" onchange="setThemeFromSelect(this.value)">
+        <option value="dark">Dark</option>
+        <option value="light">Light</option>
+        <option value="azure">Azure</option>
+        <option value="purple">Purple</option>
+        <option value="amber">Amber</option>
+      </select>
+    </div>
+    <!-- Settings gear -->
+    <div class="settings-wrap">
+      <button class="icon-btn" id="settingsBtn" onclick="toggleSettingsDropdown()" title="Impostazioni">
+        <span>⚙</span>
+      </button>
+      <div class="settings-dropdown" id="settingsDropdown">
+        <button class="settings-dropdown-btn" onclick="manualSync();closeSettingsDropdown()">
+          <span class="sdb-icon">⟳</span>
+          <span>Sync</span>
+          <span class="sync-dot" id="syncDot" style="position:static;margin-left:auto"></span>
+        </button>
+        <div class="settings-dropdown-divider"></div>
+        <button class="settings-dropdown-btn" onclick="exportJSON();closeSettingsDropdown()">
+          <span class="sdb-icon">↓</span>
+          <span>Esporta JSON</span>
+        </button>
+        <button class="settings-dropdown-btn" onclick="document.getElementById('importFile').click();closeSettingsDropdown()">
+          <span class="sdb-icon">↑</span>
+          <span>Importa JSON</span>
+        </button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
+      </div>
+    </div>
+  </div><!-- /.hdr-actions -->
+  </div><!-- /.top-bar-inner -->
+</div><!-- /.top-bar -->
+
+<!-- MAIN -->
+<main>
+
+<!-- ===== CATALOGO ===== -->
+<div class="section active" id="catalogo">
+  <div class="sec-header" style="margin-bottom:12px">
+    <h2 class="sec-title">Catalogo</h2>
+    <button class="add-btn" onclick="openAddSeriesPopup()">＋ Aggiungi serie</button>
+  </div>
+
+  <div class="search-row">
+    <input class="search-input" type="text" placeholder="🔍 Cerca nel catalogo…" id="catalogSearch" oninput="renderCatalog()">
+    <select class="sort-select" id="catalogSort" onchange="renderCatalog()">
+      <option value="eps">ep ↑</option>
+      <option value="title">A–Z</option>
+      <option value="recent">Recenti</option>
+    </select>
+  </div>
+  <div class="ep-filter-row">
+    <span class="ep-filter-label">Filtra ep</span>
+    <input class="ep-filter-input" type="number" id="epFilterInput" placeholder="es.12" min="1" oninput="renderCatalog()">
+    <button class="ep-filter-clear" onclick="clearEpFilter()">✕ Reset</button>
+    <span class="ep-filter-badge" id="epFilterBadge"></span>
+  </div>
+  <div class="stats-bar" id="catalogStats"></div>
+
+  <div class="catalog-col col-dub">
+    <div class="column-header">
+      <div class="column-title"><span class="badge dub">DUB</span><h3>Doppiato</h3></div>
+      <span class="count-badge" id="dub-count">0</span>
+    </div>
+    <div class="list" id="dub-list"></div>
+  </div>
+  <div class="catalog-col col-sub">
+    <div class="column-header">
+      <div class="column-title"><span class="badge sub">SUB</span><h3>Sottotitolato</h3></div>
+      <span class="count-badge" id="sub-count">0</span>
+    </div>
+    <div class="list" id="sub-list"></div>
+  </div>
+</div>
+
+<!-- ===== FILM ===== -->
+<div class="section" id="film-section">
+  <div class="sec-header" style="margin-bottom:12px">
+    <h2 class="sec-title">Film</h2>
+    <div class="sec-btns">
+      <button class="btn btn-ghost btn-sm" onclick="openFilmSeriesManager()">🎬 Saghe</button>
+      <button class="add-btn" onclick="openAddFilmPopup()">＋ Aggiungi</button>
+    </div>
+  </div>
+  <div class="stats-bar" id="filmStats"></div>
+  <div class="search-row">
+    <input class="search-input" type="text" placeholder="🔍 Cerca film…" id="filmSearch" oninput="renderFilms()">
+    <select class="sort-select" id="filmSort" onchange="renderFilms()">
+      <option value="title">A–Z</option>
+      <option value="recent">Recenti</option>
+      <option value="series">Per serie</option>
+    </select>
+  </div>
+  <div class="roadmap" id="film-list"></div>
+  <div class="section-label" id="film-completed-label" style="display:none; margin:14px 0 6px;">Completati</div>
+  <div class="roadmap" id="film-completed-list"></div>
+</div>
+
+<!-- ===== PROGRAMMA ===== -->
+<div class="section" id="programma">
+  <div class="sec-header">
+    <h2 class="sec-title">Roadmap</h2>
+    <div class="sec-btns">
+      <button class="btn btn-ghost btn-sm" onclick="addRandom()">⚄ Random</button>
+      <button class="btn btn-sm" onclick="addRandom('DUB')">+D</button>
+      <button class="btn btn-sm" onclick="addRandom('SUB')">+S</button>
+    </div>
+  </div>
+  <div class="stats-bar">
+    <div class="stat-pill"><span class="dot"></span> Roadmap: <strong id="roadmap-count">0</strong></div>
+    <div class="stat-pill"><span class="dot red"></span> Dropped: <strong id="drop-count">0</strong></div>
+    <div class="stat-pill"><span class="dot amber"></span> Pattern: <strong id="pattern-display">DUB</strong></div>
+  </div>
+  <div class="roadmap" id="roadmap"></div>
+  <div class="section-label" id="dropped-label" style="display:none; margin: 10px 0 6px;">Droppate</div>
+  <div class="roadmap" id="dropped"></div>
+</div>
+
+<!-- ===== COMPLETATE ===== -->
+<div class="section" id="completate">
+  <div class="sec-header"><h2 class="sec-title">Completate</h2></div>
+  <div class="stats-bar">
+    <div class="stat-pill"><span class="dot green"></span> Totale: <strong id="completed-count">0</strong></div>
+    <div class="stat-pill"><span class="dot blue"></span> Ep visti: <strong id="total-eps">0</strong></div>
+    <div class="stat-pill"><span class="dot" style="background:var(--dub-color);box-shadow:0 0 4px var(--dub-color)"></span> DUB: <strong id="completed-dub-count">0</strong></div>
+    <div class="stat-pill"><span class="dot" style="background:var(--sub-color);box-shadow:0 0 4px var(--sub-color)"></span> SUB: <strong id="completed-sub-count">0</strong></div>
+  </div>
+  <div class="ep-filter-row">
+    <span class="ep-filter-label">Filtra ep</span>
+    <input class="ep-filter-input" type="number" id="completedEpFilter" placeholder="es.12" min="1" oninput="renderCompleted()">
+    <button class="ep-filter-clear" onclick="clearCompletedEpFilter()">✕ Reset</button>
+    <span class="ep-filter-badge" id="completedEpBadge"></span>
+  </div>
+  <div class="search-row">
+    <input class="search-input" placeholder="🔍 Cerca nelle completate…" id="completedSearch" oninput="renderCompleted()">
+    <select class="sort-select" id="completedTypeFilter" onchange="renderCompleted()">
+      <option value="all">Tutti</option>
+      <option value="DUB">DUB</option>
+      <option value="SUB">SUB</option>
+    </select>
+    <select class="sort-select" id="completedSort" onchange="renderCompleted()">
+      <option value="recent">Recenti</option>
+      <option value="title">A–Z</option>
+      <option value="eps_desc">Ep ↓</option>
+      <option value="custom">✦ Custom</option>
+    </select>
+  </div>
+  <div class="completed-grid" id="completed-list"></div>
+</div>
+
+</main>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="tab-btn active" onclick="showSection(event,'catalogo')" data-section="catalogo">
+    <span class="tab-icon">📋</span>
+    <span>Catalogo</span>
+  </button>
+  <button class="tab-btn" onclick="showSection(event,'film-section')" data-section="film-section">
+    <span class="tab-icon">🎬</span>
+    <span>Film</span>
+  </button>
+  <button class="tab-btn" onclick="showSection(event,'programma')" data-section="programma">
+    <span class="tab-icon">🗺</span>
+    <span>Programma</span>
+  </button>
+  <button class="tab-btn" onclick="showSection(event,'completate')" data-section="completate">
+    <span class="tab-icon">✅</span>
+    <span>Completate</span>
+  </button>
+</nav>
+
+<!-- EDIT MODAL (serie anime) -->
+<div class="edit-modal-overlay" id="editModal">
+  <div class="edit-modal" id="edit-sheet">
+    <div class="edit-modal-header">
+      <span class="edit-modal-title">✎ Modifica serie</span>
+      <button class="edit-modal-close" onclick="closeEditModal()">✕</button>
+    </div>
+    <div class="edit-modal-field">
+      <span class="edit-modal-label">Titolo</span>
+      <input class="edit-modal-input" id="em-title" placeholder="Titolo serie">
+    </div>
+    <div class="edit-modal-row">
+      <div class="edit-modal-field">
+        <span class="edit-modal-label">Episodi</span>
+        <input class="edit-modal-input" id="em-eps" type="number" min="1" placeholder="24">
+      </div>
+      <div class="edit-modal-field">
+        <span class="edit-modal-label">Film</span>
+        <input class="edit-modal-input" id="em-films" type="number" min="0" placeholder="0">
+      </div>
+    </div>
+    <div class="edit-modal-field">
+      <span class="edit-modal-label">Note (watchorder, OVA…)</span>
+      <textarea class="edit-modal-textarea" id="em-notes" placeholder="es. guarda S2 prima degli OVA"></textarea>
+    </div>
+    <div class="edit-modal-field">
+      <div class="toggle-row">
+        <span class="toggle-label-text">📡 In corso (ongoing)</span>
+        <div class="toggle-switch" id="em-ongoing"></div>
+      </div>
+    </div>
+    <div class="edit-modal-actions">
+      <button class="edit-modal-cancel" onclick="closeEditModal()">Annulla</button>
+      <button class="edit-modal-save" onclick="saveEditModal()">✓ Salva</button>
+    </div>
+  </div>
+</div>
+
+<div class="sheet-overlay" id="sheetOverlay" onclick="closeAllEditDropdowns(); closeActionSheet();"></div>
+
+<!-- ACTION SHEET -->
+<div class="action-sheet" id="actionSheet">
+  <div class="action-sheet-handle"></div>
+  <div class="action-sheet-title" id="actionSheetTitle"></div>
+  <div class="action-sheet-sub" id="actionSheetSub"></div>
+  <div class="action-sheet-divider"></div>
+  <div id="actionSheetBtns"></div>
+</div>
+
+<!-- IMPORT MODAL -->
+<div class="modal-overlay" id="importModal">
+  <div class="modal">
+    <h3 style="font-size:1.1rem;font-weight:800;margin-bottom:0.5rem;">Importa JSON</h3>
+    <p style="font-size:0.79rem;color:var(--muted2);margin-bottom:1rem;" id="importPreview"></p>
+    <p style="font-size:0.68rem;color:var(--red);margin-bottom:0.5rem;"><strong>⚠ Modalità:</strong></p>
+    <div class="radio-group">
+      <label class="radio-label"><input type="radio" name="importMode" value="merge" checked> <span>Unisci (mantieni dati attuali)</span></label>
+      <label class="radio-label"><input type="radio" name="importMode" value="replace"> <span>Sostituisci (cancella tutto)</span></label>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:1.2rem;">
+      <button class="btn btn-ghost btn-sm" onclick="closeImportModal()">Annulla</button>
+      <button class="btn btn-sm" onclick="confirmImport()">Importa</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD SERIES POPUP -->
+<div class="popup-overlay" id="addSeriesPopup">
+  <div class="popup-box" onclick="event.stopPropagation()">
+    <div class="popup-header">
+      <span class="popup-title">✦ Nuova serie</span>
+      <button class="popup-close" onclick="closeAddSeriesPopup()">✕</button>
+    </div>
+    <div class="popup-field">
+      <span class="popup-label">Titolo</span>
+      <input class="popup-input" type="text" id="add-title" placeholder="Nome serie">
+    </div>
+    <div class="popup-row">
+      <div class="popup-field">
+        <span class="popup-label">Episodi</span>
+        <input class="popup-input" type="number" id="add-eps" placeholder="24" min="1">
+      </div>
+      <div class="popup-field">
+        <span class="popup-label">Film</span>
+        <input class="popup-input" type="number" id="add-films" placeholder="0" min="0">
+      </div>
+      <div class="popup-field">
+        <span class="popup-label">Tipo</span>
+        <select class="popup-select" id="add-type">
+          <option value="DUB">DUB</option>
+          <option value="SUB">SUB</option>
+        </select>
+      </div>
+    </div>
+    <div class="popup-field">
+      <span class="popup-label">Note (watchorder, OVA…)</span>
+      <input class="popup-input" type="text" id="add-notes" placeholder="es. guarda S2 prima degli OVA">
+    </div>
+    <div class="toggle-row" style="margin-bottom:0">
+      <span class="toggle-label-text">📡 In corso (ongoing)</span>
+      <div class="toggle-switch" id="addSeriesOngoing" onclick="this.classList.toggle('on')"></div>
+    </div>
+    <div class="popup-actions">
+      <button class="popup-cancel" onclick="closeAddSeriesPopup()">Annulla</button>
+      <button class="popup-save" onclick="addSeries()">✓ Aggiungi</button>
+    </div>
+  </div>
+</div>
+
+<!-- FILM SERIES MANAGER POPUP -->
+<div class="popup-overlay" id="filmSeriesManagerPopup">
+  <div class="popup-box" onclick="event.stopPropagation()">
+    <div class="popup-header">
+      <span class="popup-title">🎬 Gestisci Saghe</span>
+      <button class="popup-close" onclick="closeFilmSeriesManager()">✕</button>
+    </div>
+    <div class="popup-field">
+      <span class="popup-label">Titolo saga</span>
+      <input class="popup-input" type="text" id="fsm-title" placeholder="es. Il Signore degli Anelli">
+    </div>
+    <div class="popup-row">
+      <div class="popup-field">
+        <span class="popup-label">N° film totali</span>
+        <input class="popup-input" type="number" id="fsm-count" placeholder="3" min="1">
+      </div>
+      <div class="popup-field" style="display:flex;align-items:flex-end;">
+        <button class="popup-save" style="margin-bottom:0" onclick="addFilmSeries()">＋ Aggiungi</button>
+      </div>
+    </div>
+    <div class="saga-manager-list" id="fsm-list"></div>
+    <div class="popup-actions">
+      <button class="popup-cancel" onclick="closeFilmSeriesManager()">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD FILM POPUP -->
+<div class="popup-overlay" id="addFilmPopup">
+  <div class="popup-box" onclick="event.stopPropagation()">
+    <div class="popup-header">
+      <span class="popup-title">🎬 Nuovo film</span>
+      <button class="popup-close" onclick="closeAddFilmPopup()">✕</button>
+    </div>
+    <div class="popup-field">
+      <span class="popup-label">Titolo</span>
+      <input class="popup-input" type="text" id="film-add-title" placeholder="Titolo film">
+    </div>
+    <div class="popup-row">
+      <div class="popup-field">
+        <span class="popup-label">Tipo</span>
+        <select class="popup-select" id="film-add-type">
+          <option value="DUB">DUB</option>
+          <option value="SUB">SUB</option>
+        </select>
+      </div>
+      <div class="popup-field">
+        <span class="popup-label">Saga (opzionale)</span>
+        <select class="popup-select" id="film-add-series" onchange="onFilmSagaChange('film-add-series','film-add-order-wrap','film-add-order','film-add-auto-order')"></select>
+      </div>
+    </div>
+    <!-- Order selector (shown only when saga has 2+ slots) -->
+    <div class="popup-field" id="film-add-order-wrap" style="display:none">
+      <span class="popup-label">Posizione nella saga</span>
+      <select class="popup-select" id="film-add-order"></select>
+      <input type="hidden" id="film-add-auto-order">
+    </div>
+    <div class="popup-field">
+      <span class="popup-label">Note</span>
+      <input class="popup-input" type="text" id="film-add-notes" placeholder="es. sequel di…">
+    </div>
+    <div class="popup-actions">
+      <button class="popup-cancel" onclick="closeAddFilmPopup()">Annulla</button>
+      <button class="popup-save" onclick="addFilm()">✓ Aggiungi</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT FILM POPUP -->
+<div class="popup-overlay" id="editFilmPopup">
+  <div class="popup-box" onclick="event.stopPropagation()">
+    <div class="popup-header">
+      <span class="popup-title">✎ Modifica film</span>
+      <button class="popup-close" onclick="closeEditFilmPopup()">✕</button>
+    </div>
+    <div class="popup-field">
+      <span class="popup-label">Titolo</span>
+      <input class="popup-input" type="text" id="ef-title" placeholder="Titolo film">
+    </div>
+    <div class="popup-row">
+      <div class="popup-field">
+        <span class="popup-label">Tipo</span>
+        <select class="popup-select" id="ef-type">
+          <option value="DUB">DUB</option>
+          <option value="SUB">SUB</option>
+        </select>
+      </div>
+      <div class="popup-field">
+        <span class="popup-label">Saga</span>
+        <select class="popup-select" id="ef-series" onchange="onFilmSagaChange('ef-series','ef-order-wrap','ef-order','ef-auto-order')"></select>
+      </div>
+    </div>
+    <div class="popup-field" id="ef-order-wrap" style="display:none">
+      <span class="popup-label">Posizione nella saga</span>
+      <select class="popup-select" id="ef-order"></select>
+      <input type="hidden" id="ef-auto-order">
+    </div>
+    <div class="popup-field">
+      <span class="popup-label">Note</span>
+      <input class="popup-input" type="text" id="ef-notes" placeholder="es. sequel di…">
+    </div>
+    <div class="popup-actions">
+      <button class="popup-cancel" onclick="closeEditFilmPopup()">Annulla</button>
+      <button class="popup-save" onclick="saveEditFilm()">✓ Salva</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const PATTERN = ["DUB","DUB","SUB"];
+const JSONBIN_BIN_ID = '6a011939250b1311c32fd9aa';
+const JSONBIN_ACCESS_KEY = '$2a$10$.CogcsPBIjmWdNghI3OVsOCQ7p/SyxhHashUwyG3vvhnQICNDOKB6';
+const FIREBASE_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+
+const SEED_DATA = {"series":[{"id":"b7fd69c0-526c-4d09-9bb5-273a3bc6a8fc","title":"Devilman crybaby","eps":10,"type":"DUB","genre":"","inRoadmap":false,"addedAt":1778456222046,"films":0,"notes":"","ongoing":false},{"id":"f3ac2288-5018-4725-a467-a40fad92a82b","title":"Paranoia agent","eps":12,"type":"DUB","genre":"","inRoadmap":false,"addedAt":1778456222046,"films":0,"notes":"","ongoing":false},{"id":"85479f45-636a-4711-a5a6-7767311b7e6e","title":"Boogiepop phantom","eps":12,"type":"DUB","genre":"","inRoadmap":false,"addedAt":1778456222046,"films":0,"notes":"","ongoing":false},{"id":"938c27b4-4af5-4c64-a8fa-5049b417f4d4","title":"Deadman wonderland","eps":12,"type":"DUB","genre":"","inRoadmap":false,"addedAt":1778456222046,"films":0,"notes":"","ongoing":false},{"id":"7165eb91-5e1b-4da0-989a-d6fdf2ba8881","title":"Da campagnolo stagionato a gran maestro di spada","eps":12,"type":"DUB","genre":"","inRoadmap":false,"addedAt":1778456222046,"films":0,"notes":"","ongoing":false},{"id":"2efa2a7d-a784-4517-9126-fb3b631ceb1b","title":"Highschool of the dead","eps":12,"type":"DUB","genre":"","inRoadmap":false,"addedAt":1778456222046,"films":0,"notes":"","ongoing":false},{"id":"e9af4dc6-f8b0-43c5-be0f-8a32536bd0b0","title":"Alice in borderland","eps":3,"type":"SUB","genre":"","inRoadmap":false,"addedAt":1778456222047,"films":0,"notes":"","ongoing":false},{"id":"fefb52f5-a16c-4e27-a672-49277da2d0a7","title":"Housing complex C","eps":4,"type":"SUB","genre":"","inRoadmap":false,"addedAt":1778456222047,"films":0,"notes":"","ongoing":false},{"id":"741352ec-9375-443d-b400-a8b540d75004","title":"Guilty gear","eps":8,"type":"SUB","genre":"","inRoadmap":false,"addedAt":1778456222047,"films":0,"notes":"","ongoing":false},{"id":"46c7cd9c-1b9e-4bb6-b059-31e8cf276d0a","title":"Blood lad","eps":10,"type":"SUB","genre":"","inRoadmap":false,"addedAt":1778456222047,"films":0,"notes":"","ongoing":false}],"roadmap":[],"dropped":[],"completed":[],"patternIndex":0,"_updatedAt":0};
+
+let db = { series:[], roadmap:[], dropped:[], completed:[], films:[], filmsCompleted:[], filmSeries:[], patternIndex:0, _updatedAt:0 };
+let lastPushedAt=0, syncTimer=null, syncQueue=Promise.resolve();
+
+// ---- TEMA ----
+function setTheme(theme){
+  const body=document.body;
+  body.classList.remove('theme-dark','theme-light','theme-azure','theme-purple','theme-amber');
+  body.classList.add(`theme-${theme}`);
+  localStorage.setItem('st_theme',theme);
+  const sel=document.getElementById('themeSelect');
+  if(sel) sel.value=theme;
+}
+function setThemeFromSelect(t){ setTheme(t); }
+function loadTheme(){
+  const s=localStorage.getItem('st_theme');
+  if(s&&['dark','light','azure','purple','amber'].includes(s)) setTheme(s);
+  else setTheme('dark');
+}
+
+// ---- LOCAL STORAGE & SYNC ----
+function loadLocal(){
+  try{
+    const raw=localStorage.getItem('st_db');
+    if(raw){
+      const saved=JSON.parse(raw);
+      if((saved._updatedAt||0)>=(SEED_DATA._updatedAt||0)){ db={...db,...saved}; if(!db.filmSeries) db.filmSeries=[]; return; }
+    }
+    db={...db,...SEED_DATA}; if(!db.filmSeries) db.filmSeries=[]; saveLocal();
+  }catch(e){ db={...db,...SEED_DATA}; if(!db.filmSeries) db.filmSeries=[]; saveLocal(); }
+}
+function saveLocal(){ localStorage.setItem('st_db',JSON.stringify(db)); }
+async function _push(){
+  setSyncState('syncing');
+  try{
+    const res=await fetch(FIREBASE_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Access-Key':JSONBIN_ACCESS_KEY},body:JSON.stringify(db)});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    lastPushedAt=Date.now(); setSyncState('ok'); return true;
+  }catch(e){ setSyncState('err',e.message); return false; }
+}
+async function _pull(){
+  setSyncState('syncing');
+  try{
+    const res=await fetch(FIREBASE_URL+'/latest',{headers:{'X-Access-Key':JSONBIN_ACCESS_KEY}});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const json=await res.json();
+    const remote=json.record;
+    if(remote&&(remote._updatedAt||0)>(db._updatedAt||0)){
+      db=Object.assign({},db,remote);
+      if(!db.filmSeries) db.filmSeries=[];
+      saveLocal(); renderAll(); toast('Sincronizzato','success');
+      lastPushedAt=remote._updatedAt; setSyncState('ok'); return true;
+    }
+    setSyncState('ok'); return false;
+  }catch(e){ setSyncState('err',e.message); return false; }
+}
+function syncPush(){ syncQueue=syncQueue.then(()=>_push()); }
+function syncPull(){ syncQueue=syncQueue.then(()=>_pull()); }
+async function manualSync(){ syncQueue=syncQueue.then(async()=>{ const p=await _pull(); if(!p) await _push(); }); }
+function setSyncState(state){
+  const dots=document.querySelectorAll('#syncDot');
+  dots.forEach(dot=>{ dot.className='sync-dot '+state; });
+  if(state==='ok'){
+    setTimeout(()=>{ dots.forEach(d=>d.classList.add('ok')); },100);
+  }
+}
+function startSyncPoll(){ if(syncTimer) clearInterval(syncTimer); syncTimer=setInterval(()=>{ if(db._updatedAt>lastPushedAt) syncPush(); else syncPull(); },30000); }
+function save(){ db._updatedAt=Date.now(); saveLocal(); clearTimeout(window._saveDebounce); window._saveDebounce=setTimeout(syncPush,1200); }
+function toast(msg,type='info'){ const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show '+type; clearTimeout(window._toastTimer); window._toastTimer=setTimeout(()=>t.classList.remove('show'),2800); }
+
+// ---- SETTINGS DROPDOWN ----
+function toggleSettingsDropdown(){
+  const dd=document.getElementById('settingsDropdown');
+  dd.classList.toggle('open');
+}
+function closeSettingsDropdown(){
+  document.getElementById('settingsDropdown').classList.remove('open');
+}
+
+// ---- NAVIGATION ----
+function showSection(event,id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  renderAll();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ---- ADD SERIES POPUP ----
+function openAddSeriesPopup(){
+  document.getElementById('addSeriesPopup').classList.add('open');
+  setTimeout(()=>document.getElementById('add-title').focus(),150);
+}
+function closeAddSeriesPopup(){
+  document.getElementById('addSeriesPopup').classList.remove('open');
+  document.getElementById('add-title').value='';
+  document.getElementById('add-eps').value='';
+  document.getElementById('add-films').value='';
+  document.getElementById('add-notes').value='';
+  document.getElementById('addSeriesOngoing').classList.remove('on');
+}
+document.getElementById('addSeriesPopup').addEventListener('click',e=>{ if(e.target===document.getElementById('addSeriesPopup')) closeAddSeriesPopup(); });
+
+// ---- CATALOGO ----
+function addSeries(){
+  const title=document.getElementById('add-title').value.trim();
+  const eps=parseInt(document.getElementById('add-eps').value);
+  const type=document.getElementById('add-type').value;
+  const films=parseInt(document.getElementById('add-films').value)||0;
+  const notes=document.getElementById('add-notes').value.trim();
+  const ongoing=document.getElementById('addSeriesOngoing').classList.contains('on');
+  if(!title||!eps||eps<1){ toast('Compila titolo ed episodi','error'); return; }
+  if(db.series.find(s=>s.title.toLowerCase()===title.toLowerCase())){ toast('Serie già presente','error'); return; }
+  db.series.push({id:crypto.randomUUID(),title,eps,type,films,notes,ongoing,inRoadmap:false,addedAt:Date.now()});
+  save(); renderCatalog();
+  closeAddSeriesPopup();
+  toast('Serie aggiunta ✓','success');
+}
+function removeSeries(id){ db.series=db.series.filter(s=>s.id!==id); save(); renderCatalog(); toast('Serie rimossa','info'); }
+function addToRoadmap(id){
+  const s=db.series.find(x=>x.id===id);
+  if(!s||s.inRoadmap){ toast('Già in roadmap','error'); return; }
+  s.inRoadmap=true;
+  db.roadmap.push({id:s.id,title:s.title,eps:s.eps,type:s.type,status:'normal',currentEp:0});
+  save(); renderAll(); toast('Aggiunto alla roadmap ✓','success');
+}
+function renderSortedSeries(list){
+  const sort=document.getElementById('catalogSort')?.value||'eps';
+  return [...list].sort((a,b)=>{ if(sort==='title') return a.title.localeCompare(b.title); if(sort==='recent') return (b.addedAt||0)-(a.addedAt||0); return a.eps-b.eps||a.title.localeCompare(b.title); });
+}
+function renderList(id,data){
+  const el=document.getElementById(id);
+  if(!data.length){ el.innerHTML='<div class="empty"><div class="empty-icon">◌</div>Nessuna serie</div>'; return; }
+  el.innerHTML=data.map((s,i)=>{
+    let tagsHtml='';
+    if(s.ongoing) tagsHtml+='<span class="item-tag ongoing">▶ In corso</span>';
+    if(s.films>0) tagsHtml+='<span class="item-tag films">🎬 '+s.films+' film</span>';
+    const tagsRow=tagsHtml?'<div class="item-tags">'+tagsHtml+'</div>':'';
+    const notesRow=s.notes?'<div class="item-notes-row">📝 '+escHtml(s.notes)+'</div>':'';
+    return '<div class="item" style="animation:itemIn .2s '+(i*0.025)+'s both" id="item-'+s.id+'">'
+      +'<div class="item-num">'+(i+1)+'</div>'
+      +'<div class="item-body">'
+        +'<div class="item-title">'+escHtml(s.title)+'</div>'
+        +tagsRow+notesRow
+      +'</div>'
+      +'<div class="item-eps">'+s.eps+'</div>'
+      +'<div class="item-actions">'
+        +'<button class="menu-btn" onclick="event.stopPropagation();openCatalogMenu(\''+s.id+'\')">···</button>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+// ---- RENDER CATALOG ----
+function renderCatalog(){
+  const q=(document.getElementById('catalogSearch')?.value||'').toLowerCase();
+  const epF=parseInt(document.getElementById('epFilterInput')?.value)||0;
+  const badge=document.getElementById('epFilterBadge');
+  if(epF>0&&badge){ badge.textContent=`${epF} ep`; badge.classList.add('active'); } else if(badge){ badge.classList.remove('active'); }
+  let filtered=db.series.filter(s=>!s.inRoadmap&&(!q||s.title.toLowerCase().includes(q))&&(!epF||s.eps===epF));
+  const dubs=renderSortedSeries(filtered.filter(s=>s.type==='DUB'));
+  const subs=renderSortedSeries(filtered.filter(s=>s.type==='SUB'));
+  document.getElementById('dub-count').textContent=dubs.length;
+  document.getElementById('sub-count').textContent=subs.length;
+  const all=db.series;
+  const totalEps=all.reduce((a,s)=>a+s.eps,0);
+  document.getElementById('catalogStats').innerHTML=`<div class="stat-pill"><span class="dot"></span> Totale: <strong>${all.length}</strong></div><div class="stat-pill"><span class="dot blue"></span> DUB: <strong>${all.filter(s=>s.type==='DUB').length}</strong></div><div class="stat-pill"><span class="dot red"></span> SUB: <strong>${all.filter(s=>s.type==='SUB').length}</strong></div><div class="stat-pill"><span class="dot amber"></span> Ep totali: <strong>${totalEps}</strong></div>`;
+  renderList('dub-list',dubs);
+  renderList('sub-list',subs);
+}
+
+// Global edit modal
+let _editModalId = null;
+function openEditModal(id){
+  const s=db.series.find(x=>x.id===id); if(!s) return;
+  _editModalId=id;
+  document.getElementById('em-title').value=s.title;
+  document.getElementById('em-eps').value=s.eps;
+  document.getElementById('em-films').value=s.films||0;
+  document.getElementById('em-notes').value=s.notes||'';
+  const ongoingEl=document.getElementById('em-ongoing');
+  ongoingEl.classList.toggle('on', !!s.ongoing);
+  ongoingEl.onclick=()=>ongoingEl.classList.toggle('on');
+  document.getElementById('editModal').classList.add('open');
+  setTimeout(()=>document.getElementById('em-title').focus(),150);
+}
+function closeEditModal(){
+  document.getElementById('editModal').classList.remove('open');
+  _editModalId=null;
+}
+function saveEditModal(){
+  if(!_editModalId) return;
+  const s=db.series.find(x=>x.id===_editModalId); if(!s) return;
+  const newTitle=document.getElementById('em-title').value.trim();
+  const newEps=parseInt(document.getElementById('em-eps').value);
+  if(!newTitle||!newEps||newEps<1){ toast('Dati non validi','error'); return; }
+  s.title=newTitle; s.eps=newEps;
+  s.films=parseInt(document.getElementById('em-films').value)||0;
+  s.notes=document.getElementById('em-notes').value.trim();
+  s.ongoing=document.getElementById('em-ongoing').classList.contains('on');
+  [db.roadmap,db.dropped,db.completed].forEach(arr=>{ const r=arr.find(x=>x.id===_editModalId); if(r){ r.title=newTitle; r.eps=newEps; } });
+  save();
+  const itemEl=document.getElementById('item-'+_editModalId);
+  if(itemEl){
+    const tags=[];
+    if(s.ongoing) tags.push(`<span class="item-tag ongoing">▶ In corso</span>`);
+    if(s.films>0) tags.push(`<span class="item-tag films">🎬 ${s.films} film</span>`);
+    const body=itemEl.querySelector('.item-body');
+    if(body){
+      body.querySelector('.item-title').textContent=s.title;
+      let tagsEl=body.querySelector('.item-tags');
+      if(tags.length){ if(!tagsEl){ tagsEl=document.createElement('div'); tagsEl.className='item-tags'; body.appendChild(tagsEl); } tagsEl.innerHTML=tags.join(''); }
+      else if(tagsEl) tagsEl.remove();
+      let notesEl=body.querySelector('.item-notes-row');
+      if(s.notes){ if(!notesEl){ notesEl=document.createElement('div'); notesEl.className='item-notes-row'; body.appendChild(notesEl); } notesEl.textContent='📝 '+s.notes; }
+      else if(notesEl) notesEl.remove();
+    }
+    itemEl.querySelector('.item-eps').textContent=s.eps;
+  }
+  toast('Serie aggiornata ✓','success');
+  closeEditModal();
+}
+document.getElementById('editModal').addEventListener('click', e=>{
+  if(e.target===document.getElementById('editModal')) closeEditModal();
+});
+
+// ---- ROADMAP ----
+function addRandom(forceType){
+  const required=forceType||PATTERN[db.patternIndex];
+  const pool=db.series.filter(s=>!s.inRoadmap&&s.type===required);
+  if(!pool.length){ toast(`Nessuna serie ${required} disponibile`,'error'); return; }
+  const picked=pool[Math.floor(Math.random()*pool.length)];
+  picked.inRoadmap=true;
+  db.roadmap.push({id:picked.id,title:picked.title,eps:picked.eps,type:picked.type,status:'normal',currentEp:0});
+  if(!forceType) db.patternIndex=(db.patternIndex+1)%PATTERN.length;
+  save(); renderAll(); toast(`Aggiunto: ${picked.title}`,'success');
+}
+function setWatching(id){
+  const item=db.roadmap.find(r=>r.id===id);
+  if(!item) return;
+  item.status=item.status==='watching'?'normal':'watching';
+  save();
+  toast(item.status==='watching'?`▶ In visione: ${item.title}`:`⏸ Interrotto: ${item.title}`);
+  renderRoadmap();
+}
+function dropEntry(id){
+  const idx=db.roadmap.findIndex(r=>r.id===id);
+  if(idx===-1) return;
+  const item=db.roadmap.splice(idx,1)[0];
+  db.dropped.push(item);
+  db.series=db.series.filter(s=>s.id!==item.id);
+  save(); renderAll(); toast(`Droppato: ${item.title}`,'info');
+}
+function completeEntry(id){
+  const idx=db.roadmap.findIndex(r=>r.id===id);
+  if(idx===-1) return;
+  const item=db.roadmap.splice(idx,1)[0];
+  db.completed.push({...item,completedAt:Date.now()});
+  db.series=db.series.filter(s=>s.id!==item.id);
+  save(); renderAll(); toast(`✓ Completato: ${item.title}`,'success');
+}
+function backToRoadmap_fromCompleted(id){
+  const idx=db.completed.findIndex(r=>r.id===id);
+  if(idx===-1) return;
+  const item=db.completed.splice(idx,1)[0];
+  item.status='normal'; delete item.completedAt;
+  db.roadmap.push(item);
+  if(!db.series.find(s=>s.id===item.id)) db.series.push({id:item.id,title:item.title,eps:item.eps,type:item.type,inRoadmap:true,addedAt:Date.now()});
+  save(); renderAll(); toast(`Riportato in roadmap: ${item.title}`,'success');
+}
+function backToCalatogo_fromRoadmap(id){
+  const idx=db.roadmap.findIndex(r=>r.id===id);
+  if(idx===-1) return;
+  const item=db.roadmap.splice(idx,1)[0];
+  const existing=db.series.find(s=>s.id===item.id);
+  if(existing) existing.inRoadmap=false;
+  else db.series.push({id:item.id,title:item.title,eps:item.eps,type:item.type,inRoadmap:false,addedAt:Date.now()});
+  save(); renderAll(); toast(`${item.title} torna in catalogo`,'info');
+}
+function backToCatalogo_fromDropped(id){
+  const idx=db.dropped.findIndex(r=>r.id===id);
+  if(idx===-1) return;
+  const item=db.dropped.splice(idx,1)[0];
+  if(!db.series.find(s=>s.id===item.id)) db.series.push({id:item.id,title:item.title,eps:item.eps,type:item.type,inRoadmap:false,addedAt:Date.now()});
+  save(); renderAll(); toast(`${item.title} ripristinato in catalogo`,'info');
+}
+function restoreDropped(id){
+  const idx=db.dropped.findIndex(r=>r.id===id);
+  if(idx===-1) return;
+  const item=db.dropped.splice(idx,1)[0];
+  item.status='normal'; db.roadmap.push(item);
+  if(!db.series.find(s=>s.id===item.id)) db.series.push({id:item.id,title:item.title,eps:item.eps,type:item.type,inRoadmap:true,addedAt:Date.now()});
+  save(); renderAll(); toast(`Ripristinato in roadmap: ${item.title}`,'success');
+}
+
+// ---- UTIL ----
+function reorderEntry(arr,id,dir,renderFn){
+  const idx=arr.findIndex(x=>x.id===id);
+  if(idx===-1) return;
+  const newIdx=idx+dir;
+  if(newIdx<0||newIdx>=arr.length) return;
+  [arr[idx],arr[newIdx]]=[arr[newIdx],arr[idx]];
+  save(); renderFn();
+}
+function updateEp(id,val){
+  const item=db.roadmap.find(r=>r.id===id);
+  if(!item) return;
+  item.currentEp=Math.min(item.eps,Math.max(0,parseInt(val)||0));
+  save();
+  _updateProgressDOM(id, item);
+}
+function stepEp(id,delta){
+  const item=db.roadmap.find(r=>r.id===id);
+  if(!item) return;
+  item.currentEp=Math.min(item.eps,Math.max(0,(item.currentEp||0)+delta));
+  save();
+  _updateProgressDOM(id, item);
+}
+function _updateProgressDOM(id, item){
+  const rmEl=document.querySelector(`.rm-item[data-id="${id}"]`);
+  if(!rmEl) return;
+  const fill=rmEl.querySelector('.progress-fill');
+  const inp=rmEl.querySelector('.ep-input');
+  if(fill) fill.style.width=Math.round((item.currentEp||0)/item.eps*100)+'%';
+  if(inp) inp.value=item.currentEp||0;
+}
+
+// ---- ACTION SHEET ----
+let _actionSheetOpen = false;
+let _actionSheetCallbacks = [];
+function openActionSheet(title, sub, buttons){
+  const sheet = document.getElementById('actionSheet');
+  const overlay = document.getElementById('sheetOverlay');
+  document.getElementById('actionSheetTitle').textContent = title;
+  document.getElementById('actionSheetSub').textContent = sub;
+  _actionSheetCallbacks = buttons.map(b => b.action);
+  const btnsEl = document.getElementById('actionSheetBtns');
+  btnsEl.innerHTML = buttons.map((b, i)=>`
+    <button class="action-sheet-btn ${b.cls||''}" data-cb="${i}">
+      <span class="asb-icon ${b.iconBg||'gray-bg'}">${b.icon}</span>
+      <span>${b.label}</span>
+    </button>`).join('');
+  btnsEl.onclick = e => {
+    const btn = e.target.closest('[data-cb]');
+    if (!btn) return;
+    e.stopPropagation();
+    const idx = parseInt(btn.dataset.cb);
+    closeActionSheet();
+    if (_actionSheetCallbacks[idx]) _actionSheetCallbacks[idx]();
+  };
+  sheet.classList.add('open');
+  overlay.classList.add('open');
+  _actionSheetOpen = true;
+  sheet.onclick = e => e.stopPropagation();
+}
+function closeActionSheet(){
+  document.getElementById('actionSheet').classList.remove('open');
+  document.getElementById('sheetOverlay').classList.remove('open');
+  _actionSheetOpen = false;
+}
+function openRoadmapMenu(id){
+  const r = db.roadmap.find(x=>x.id===id); if(!r) return;
+  openActionSheet(r.title, `${r.eps} ep · ${r.type}`, [
+    { icon: r.status==='watching'?'⏸':'▶', iconBg:'amber-bg', cls:'amber',
+      label: r.status==='watching'?'Interrompi visione':'Segna come In visione',
+      action: () => setWatching(id) },
+    { icon: '✓', iconBg:'green-bg', cls:'green', label:'Completa',
+      action: () => completeEntry(id) },
+    { icon: '↩', iconBg:'blue-bg', cls:'blue', label:'Torna al catalogo',
+      action: () => backToCalatogo_fromRoadmap(id) },
+    { icon: '✕', iconBg:'red-bg', cls:'red', label:'Droppa',
+      action: () => dropEntry(id) },
+  ]);
+}
+function openDroppedMenu(id){
+  const r = db.dropped.find(x=>x.id===id); if(!r) return;
+  openActionSheet(r.title, `${r.eps} ep · ${r.type} · droppata`, [
+    { icon: '↩', iconBg:'green-bg', cls:'green', label:'Ripristina in roadmap',
+      action: () => restoreDropped(id) },
+    { icon: '◌', iconBg:'blue-bg', cls:'blue', label:'Torna al catalogo',
+      action: () => backToCatalogo_fromDropped(id) },
+  ]);
+}
+function openCompletedMenu(id){
+  const r = db.completed.find(x=>x.id===id); if(!r) return;
+  openActionSheet(r.title, `${r.eps} ep · ${r.type} · completata il ${new Date(r.completedAt).toLocaleDateString('it-IT')}`, [
+    { icon: '↩', iconBg:'amber-bg', cls:'amber', label:'Riporta in roadmap',
+      action: () => backToRoadmap_fromCompleted(id) },
+  ]);
+}
+function openCatalogMenu(id){
+  const s = db.series.find(x=>x.id===id); if(!s) return;
+  openActionSheet(s.title, `${s.eps} ep · ${s.type}`, [
+    { icon: '＋', iconBg:'green-bg', cls:'green', label:'Aggiungi alla roadmap',
+      action: () => addToRoadmap(id) },
+    { icon: '✎', iconBg:'blue-bg', cls:'blue', label:'Modifica',
+      action: () => openEditModal(id) },
+    { icon: '✕', iconBg:'red-bg', cls:'red', label:'Rimuovi dal catalogo',
+      action: () => removeSeries(id) },
+  ]);
+}
+
+// ---- RENDER ROADMAP ----
+function renderRoadmap(){
+  const el=document.getElementById('roadmap');
+  document.getElementById('roadmap-count').textContent=db.roadmap.length;
+  document.getElementById('pattern-display').textContent=PATTERN[db.patternIndex];
+  if(!db.roadmap.length){ el.innerHTML='<div class="empty"><div class="empty-icon">▷</div>Roadmap vuota</div>'; return; }
+  el.innerHTML=db.roadmap.map((r,i)=>{
+    const isW=r.status==='watching';
+    const watchTag=isW?'<div class="watching-tag" style="flex-shrink:0">● watching</div>':'';
+    const pct=Math.round((r.currentEp||0)/r.eps*100);
+    const progressRow=isW
+      ?'<div class="progress-row">'
+        +'<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div>'
+        +'<div class="ep-stepper-row">'
+          +'<button class="step-btn" onclick="stepEp(\''+r.id+'\',-1)">‹</button>'
+          +'<input class="ep-input" type="number" min="0" max="'+r.eps+'" value="'+(r.currentEp||0)+'" onchange="updateEp(\''+r.id+'\',this.value)">'
+          +'<button class="step-btn" onclick="stepEp(\''+r.id+'\',1)">›</button>'
+          +'<span class="progress-num">/ '+r.eps+'</span>'
+        +'</div>'
+      +'</div>'
+      :'';
+    return '<div class="rm-item '+(isW?'watching':'')+'" data-id="'+r.id+'" style="animation:itemIn .22s '+(i*0.04)+'s both">'
+      +'<div class="drag-handle">⠿</div>'
+      +'<div class="rm-num">'+String(i+1).padStart(2,'0')+'</div>'
+      +'<div class="rm-info">'
+        +'<div style="display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap;">'
+          +'<div class="rm-name" style="flex:1;min-width:0">'+escHtml(r.title)+'</div>'
+          +watchTag
+        +'</div>'
+        +'<div class="rm-meta" style="margin-top:4px">'+r.eps+' ep · <span class="badge '+r.type.toLowerCase()+'" style="padding:1px 6px;font-size:0.56rem">'+r.type+'</span></div>'
+        +progressRow
+      +'</div>'
+      +'<div class="rm-actions">'
+        +'<div class="reorder-btns">'
+          +'<button class="reorder-btn" onclick="reorderEntry(db.roadmap,\''+r.id+'\',-1,renderRoadmap)">▲</button>'
+          +'<button class="reorder-btn" onclick="reorderEntry(db.roadmap,\''+r.id+'\',1,renderRoadmap)">▼</button>'
+        +'</div>'
+        +'<button class="menu-btn" onclick="event.stopPropagation();openRoadmapMenu(\''+r.id+'\')">···</button>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+  initDragDrop(el,db.roadmap,renderRoadmap);
+}
+
+function renderDropped(){
+  const el=document.getElementById('dropped'),label=document.getElementById('dropped-label');
+  document.getElementById('drop-count').textContent=db.dropped.length;
+  if(!db.dropped.length){ el.innerHTML=''; label.style.display='none'; return; }
+  label.style.display='flex';
+  el.innerHTML=db.dropped.map((r,i)=>
+    '<div class="rm-item" style="opacity:0.65" data-id="'+r.id+'">'
+      +'<div class="drag-handle">⠿</div>'
+      +'<div class="rm-num">'+String(i+1).padStart(2,'0')+'</div>'
+      +'<div class="rm-info">'
+        +'<div class="rm-name" style="text-decoration:line-through">'+escHtml(r.title)+'</div>'
+        +'<div class="rm-meta">'+r.eps+' ep · <span class="badge dropped" style="padding:1px 6px;font-size:0.56rem">dropped</span></div>'
+      +'</div>'
+      +'<div class="rm-actions">'
+        +'<button class="menu-btn" onclick="event.stopPropagation();openDroppedMenu(\''+r.id+'\')">···</button>'
+      +'</div>'
+    +'</div>'
+  ).join('');
+  initDragDrop(el,db.dropped,renderDropped);
+}
+
+// ---- COMPLETATE ----
+function clearCompletedEpFilter(){ document.getElementById('completedEpFilter').value=''; renderCompleted(); }
+function renderCompleted(){
+  const q=(document.getElementById('completedSearch')?.value||'').toLowerCase();
+  const sort=document.getElementById('completedSort')?.value||'recent';
+  const typeFilter=document.getElementById('completedTypeFilter')?.value||'all';
+  const epF=parseInt(document.getElementById('completedEpFilter')?.value)||0;
+  const badge=document.getElementById('completedEpBadge');
+  if(epF>0&&badge){ badge.textContent=`${epF} ep`; badge.classList.add('active'); } else if(badge){ badge.classList.remove('active'); }
+  let data=db.completed.filter(r=>(!q||r.title.toLowerCase().includes(q))&&(typeFilter==='all'||r.type===typeFilter)&&(!epF||r.eps===epF));
+  if(sort!=='custom'){ data.sort((a,b)=>{ if(sort==='title') return a.title.localeCompare(b.title); if(sort==='eps_desc') return (b.eps||0)-(a.eps||0); return (b.completedAt||0)-(a.completedAt||0); }); }
+  document.getElementById('completed-count').textContent=db.completed.length;
+  document.getElementById('total-eps').textContent=db.completed.reduce((a,r)=>a+(r.eps||0),0);
+  document.getElementById('completed-dub-count').textContent=db.completed.filter(r=>r.type==='DUB').length;
+  document.getElementById('completed-sub-count').textContent=db.completed.filter(r=>r.type==='SUB').length;
+  const el=document.getElementById('completed-list');
+  if(!data.length){ el.innerHTML='<div class="empty">Nessuna serie completata</div>'; return; }
+  el.innerHTML=data.map((r,i)=>{
+    const typeColor=r.type==='DUB'?'var(--dub-color)':'var(--sub-color)';
+    const date=new Date(r.completedAt).toLocaleDateString('it-IT');
+    return '<div class="completed-item" data-id="'+r.id+'" style="animation:itemIn .22s '+(i*0.04)+'s both">'
+      +'<div class="drag-handle">⠿</div>'
+      +'<div class="c-num">'+String(i+1).padStart(2,'0')+'</div>'
+      +'<div class="check-mark">✓</div>'
+      +'<div class="c-info">'
+        +'<div class="c-title">'+escHtml(r.title)+'</div>'
+        +'<div class="c-meta">'+r.eps+' ep · '+date+' · <span style="color:'+typeColor+'">'+r.type+'</span></div>'
+      +'</div>'
+      +'<div class="c-actions">'
+        +'<div class="reorder-btns">'
+          +'<button class="reorder-btn" onclick="reorderEntry(db.completed,\''+r.id+'\',-1,renderCompleted)">▲</button>'
+          +'<button class="reorder-btn" onclick="reorderEntry(db.completed,\''+r.id+'\',1,renderCompleted)">▼</button>'
+        +'</div>'
+        +'<button class="menu-btn" onclick="event.stopPropagation();openCompletedMenu(\''+r.id+'\')">···</button>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+  initDragDrop(el,db.completed,renderCompleted);
+}
+
+// ---- DRAG & DROP ----
+function initDragDrop(container,dataArray,renderFn){
+  if(!container) return;
+  const ITEM_SEL=container.id==='completed-list'?'.completed-item':'.rm-item';
+  let dragging=null,clone=null,ghost=null,startX=0,startY=0,startRect=null,active=false;
+  function getItem(el){ return el?el.closest(ITEM_SEL):null; }
+  function moveGhost(targetItem,clientY){
+    if(!ghost||!targetItem||targetItem===dragging) return;
+    const r=targetItem.getBoundingClientRect();
+    if(clientY<r.top+r.height/2) container.insertBefore(ghost,targetItem);
+    else container.insertBefore(ghost,targetItem.nextSibling);
+  }
+  function startDrag(clientX,clientY,item){
+    dragging=item; startX=clientX; startY=clientY;
+    startRect=item.getBoundingClientRect(); active=false;
+  }
+  function beginVisuals(){
+    active=true;
+    clone=dragging.cloneNode(true);
+    clone.style.cssText=`position:fixed;left:${startRect.left}px;top:${startRect.top}px;width:${startRect.width}px;
+      opacity:0.92;z-index:9999;pointer-events:none;transition:none;
+      box-shadow:0 20px 60px rgba(0,0,0,0.6),0 0 0 1px var(--accent),0 0 30px var(--accentGlow);
+      transform:scale(1.03) rotate(0.4deg);border-radius:16px;`;
+    document.body.appendChild(clone);
+    ghost=document.createElement('div');
+    ghost.className='drag-ghost';
+    ghost.style.cssText=`height:${startRect.height}px;border-radius:16px;
+      border:2px dashed var(--accent);background:var(--card-hover);opacity:0.6;flex-shrink:0;`;
+    container.insertBefore(ghost,dragging.nextSibling);
+    dragging.style.opacity='0.12';
+  }
+  function moveDrag(clientX,clientY){
+    if(!dragging) return;
+    if(!active){
+      if(Math.abs(clientX-startX)<4&&Math.abs(clientY-startY)<4) return;
+      beginVisuals();
+    }
+    clone.style.left=(startRect.left+clientX-startX)+'px';
+    clone.style.top=(startRect.top+clientY-startY)+'px';
+    clone.style.visibility='hidden';
+    const under=document.elementFromPoint(clientX,clientY);
+    clone.style.visibility='';
+    const target=getItem(under);
+    if(target&&target!==dragging&&target!==ghost) moveGhost(target,clientY);
+  }
+  function endDrag(){
+    if(!dragging) return;
+    if(active&&ghost){
+      container.insertBefore(dragging,ghost);
+      ghost.remove();
+      const domIds=[...container.querySelectorAll(ITEM_SEL)].map(el=>el.dataset.id);
+      const map={};
+      dataArray.forEach(item=>{ map[item.id]=item; });
+      const newOrder=domIds.map(id=>map[id]).filter(Boolean);
+      if(newOrder.length===dataArray.length){
+        dataArray.splice(0,dataArray.length,...newOrder);
+        if(container.id==='completed-list'){
+          const sortEl=document.getElementById('completedSort');
+          if(sortEl&&sortEl.value!=='custom') sortEl.value='custom';
+        }
+        save();
+      }
+    }
+    if(clone){ clone.remove(); clone=null; }
+    if(ghost){ ghost.remove(); ghost=null; }
+    if(dragging){ dragging.style.opacity=''; dragging=null; }
+    active=false;
+    renderFn();
+  }
+  container.querySelectorAll('.drag-handle').forEach(handle=>{
+    handle.addEventListener('mousedown',e=>{
+      const item=getItem(e.target); if(!item) return;
+      e.preventDefault(); startDrag(e.clientX,e.clientY,item);
+      const onMove=e=>moveDrag(e.clientX,e.clientY);
+      const onUp=()=>{ endDrag(); document.removeEventListener('mousemove',onMove); document.removeEventListener('mouseup',onUp); };
+      document.addEventListener('mousemove',onMove);
+      document.addEventListener('mouseup',onUp);
+    });
+    handle.addEventListener('touchstart',e=>{
+      const item=getItem(e.target); if(!item) return;
+      e.preventDefault(); const t=e.touches[0]; startDrag(t.clientX,t.clientY,item);
+      const onMove=e=>{ e.preventDefault(); const t=e.touches[0]; moveDrag(t.clientX,t.clientY); };
+      const onEnd=()=>{ endDrag(); document.removeEventListener('touchmove',onMove); document.removeEventListener('touchend',onEnd); };
+      document.addEventListener('touchmove',onMove,{passive:false});
+      document.addEventListener('touchend',onEnd);
+    },{passive:false});
+  });
+}
+
+// ---- EXPORT / IMPORT ----
+function exportJSON(){
+  const blob=new Blob([JSON.stringify({version:2,data:db},null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`serietracker-${new Date().toISOString().slice(0,10)}.json`;
+  a.click(); URL.revokeObjectURL(blob); toast('Backup esportato ↓','success');
+}
+let _pendingImport=null;
+function importJSON(event){
+  const file=event.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const parsed=JSON.parse(e.target.result);
+      const imported=parsed.data||parsed;
+      if(!imported.series&&!imported.roadmap){ toast('File non valido','error'); return; }
+      _pendingImport=imported;
+      document.getElementById('importPreview').innerHTML=`<strong>${file.name}</strong><br>Catalogo: ${imported.series?.length||0} · Roadmap: ${imported.roadmap?.length||0} · Completate: ${imported.completed?.length||0} · Film: ${imported.films?.length||0} · Saghe film: ${imported.filmSeries?.length||0}`;
+      document.getElementById('importModal').classList.add('open');
+    }catch(err){ toast('Errore JSON','error'); }
+  };
+  reader.readAsText(file); event.target.value='';
+}
+function confirmImport(){
+  if(!_pendingImport){ closeImportModal(); return; }
+  const mode=document.querySelector('input[name="importMode"]:checked').value;
+  if(mode==='replace'){
+    db={series:_pendingImport.series||[],roadmap:_pendingImport.roadmap||[],dropped:_pendingImport.dropped||[],completed:_pendingImport.completed||[],films:_pendingImport.films||[],filmsCompleted:_pendingImport.filmsCompleted||[],filmSeries:_pendingImport.filmSeries||[],patternIndex:_pendingImport.patternIndex||0,_updatedAt:Date.now()};
+  } else {
+    const existingIds=new Set([...db.series.map(x=>x.id),...db.roadmap.map(x=>x.id),...db.dropped.map(x=>x.id),...db.completed.map(x=>x.id)]);
+    const existingMovieIds=new Set([...(db.films||[]).map(x=>x.id),...(db.filmsCompleted||[]).map(x=>x.id)]);
+    const existingFsIds=new Set((db.filmSeries||[]).map(x=>x.id));
+    (_pendingImport.series||[]).forEach(x=>{ if(!existingIds.has(x.id)) db.series.push(x); });
+    (_pendingImport.roadmap||[]).forEach(x=>{ if(!existingIds.has(x.id)) db.roadmap.push(x); });
+    (_pendingImport.dropped||[]).forEach(x=>{ if(!existingIds.has(x.id)) db.dropped.push(x); });
+    (_pendingImport.completed||[]).forEach(x=>{ if(!existingIds.has(x.id)) db.completed.push(x); });
+    (_pendingImport.films||[]).forEach(x=>{ if(!existingMovieIds.has(x.id)) db.films.push(x); });
+    (_pendingImport.filmsCompleted||[]).forEach(x=>{ if(!existingMovieIds.has(x.id)) db.filmsCompleted.push(x); });
+    (_pendingImport.filmSeries||[]).forEach(x=>{ if(!existingFsIds.has(x.id)) db.filmSeries.push(x); });
+  }
+  _pendingImport=null; save(); renderAll(); closeImportModal(); toast('Import completato ✓','success');
+}
+function closeImportModal(){ document.getElementById('importModal').classList.remove('open'); _pendingImport=null; }
+function renderAll(){ renderCatalog(); renderRoadmap(); renderDropped(); renderCompleted(); renderFilms(); }
+
+// ========== FILM SECTION ==========
+
+// ---- Lookup helpers ----
+// Returns {id, title, count, _source} — searches filmSeries first, then anime series
+function getSeriesRecord(id){
+  if(!id) return null;
+  const fs=(db.filmSeries||[]).find(x=>x.id===id);
+  if(fs) return {id:fs.id, title:fs.title, count:fs.count, _source:'film'};
+  // search anime series (roadmap + dropped + completed + catalog)
+  const allSeries=[...db.series, ...db.roadmap.map(r=>({id:r.id,title:r.title,films:r.films||0})), ...db.dropped.map(r=>({id:r.id,title:r.title,films:r.films||0})), ...db.completed.map(r=>({id:r.id,title:r.title,films:r.films||0}))];
+  const found=db.series.find(s=>s.id===id);
+  if(found) return {id:found.id, title:found.title, count:found.films||0, _source:'anime'};
+  return null;
+}
+
+// Deduplicated anime sagas (series with films>=1) from all lists
+function getAnimeSagas(){
+  const seen=new Set();
+  const result=[];
+  const allSeries=[...db.series, ...[...db.roadmap,...db.dropped,...db.completed].map(r=>{
+    const s=db.series.find(x=>x.id===r.id)||{id:r.id,title:r.title,films:0};
+    return s;
+  })];
+  allSeries.forEach(s=>{
+    if(!seen.has(s.id)&&(s.films||0)>=1){
+      seen.add(s.id);
+      result.push({id:s.id, title:s.title, count:s.films, _source:'anime'});
+    }
+  });
+  return result;
+}
+
+// Count films already assigned to a saga (excluding a specific film id when editing)
+function countAssigned(sagaId, excludeFilmId=null){
+  const allFilms=[...(db.films||[]),...(db.filmsCompleted||[])];
+  return allFilms.filter(f=>f.seriesId===sagaId&&f.id!==excludeFilmId).length;
+}
+
+// Get which positions are taken in a saga (excluding a film)
+function getTakenPositions(sagaId, excludeFilmId=null){
+  const allFilms=[...(db.films||[]),...(db.filmsCompleted||[])];
+  return allFilms.filter(f=>f.seriesId===sagaId&&f.id!==excludeFilmId).map(f=>f.seriesOrder).filter(x=>x!=null);
+}
+
+// ---- Populate saga select ----
+function populateFilmSagaSelect(selectId, currentSeriesId='', excludeFilmId=null){
+  const sel=document.getElementById(selectId); if(!sel) return;
+  const animeSagas=getAnimeSagas();
+  const filmSeries=(db.filmSeries||[]);
+
+  // Filter sagas that still have free slots (unless it's the current series being edited)
+  const animeAvail=animeSagas.filter(s=>{
+    const assigned=countAssigned(s.id, excludeFilmId);
+    return s.id===currentSeriesId || assigned < s.count;
+  });
+  const filmAvail=filmSeries.filter(s=>{
+    const assigned=countAssigned(s.id, excludeFilmId);
+    return s.id===currentSeriesId || assigned < s.count;
+  });
+
+  let html='<option value="">— Stand-alone —</option>';
+  if(animeAvail.length){
+    html+=`<optgroup label="📺 Saga Anime">`;
+    animeAvail.forEach(s=>{ html+=`<option value="${s.id}"${s.id===currentSeriesId?' selected':''}>${escHtml(s.title)}</option>`; });
+    html+='</optgroup>';
+  }
+  if(filmAvail.length){
+    html+=`<optgroup label="🎬 Saga Film">`;
+    filmAvail.forEach(s=>{ html+=`<option value="${s.id}"${s.id===currentSeriesId?' selected':''}>${escHtml(s.title)}</option>`; });
+    html+='</optgroup>';
+  }
+  sel.innerHTML=html;
+}
+
+// ---- Order selector logic ----
+function onFilmSagaChange(selectId, orderWrapId, orderSelectId, autoOrderId, excludeFilmId=null){
+  const sel=document.getElementById(selectId);
+  const orderWrap=document.getElementById(orderWrapId);
+  const orderSel=document.getElementById(orderSelectId);
+  const autoOrder=document.getElementById(autoOrderId);
+  if(!sel||!orderWrap||!orderSel||!autoOrder) return;
+
+  const sagaId=sel.value;
+  autoOrder.value='';
+  orderWrap.style.display='none';
+  if(!sagaId) return;
+
+  const rec=getSeriesRecord(sagaId);
+  if(!rec) return;
+
+  const count=rec.count||0;
+  const taken=getTakenPositions(sagaId, excludeFilmId);
+  const freeSlots=[];
+  for(let i=1;i<=count;i++){ if(!taken.includes(i)) freeSlots.push(i); }
+
+  if(freeSlots.length===1){
+    // Auto-assign
+    autoOrder.value=freeSlots[0];
+    orderWrap.style.display='none';
+  } else if(freeSlots.length>1){
+    // Show selector
+    orderSel.innerHTML=freeSlots.map(pos=>`<option value="${pos}">${pos}°</option>`).join('');
+    orderWrap.style.display='flex'; orderWrap.style.flexDirection='column';
+  }
+}
+
+// ---- Film Series Manager ----
+function openFilmSeriesManager(){
+  renderFilmSeriesManagerList();
+  document.getElementById('filmSeriesManagerPopup').classList.add('open');
+  document.getElementById('fsm-title').focus();
+}
+function closeFilmSeriesManager(){
+  document.getElementById('filmSeriesManagerPopup').classList.remove('open');
+  document.getElementById('fsm-title').value='';
+  document.getElementById('fsm-count').value='';
+}
+document.getElementById('filmSeriesManagerPopup').addEventListener('click',e=>{ if(e.target===document.getElementById('filmSeriesManagerPopup')) closeFilmSeriesManager(); });
+
+function addFilmSeries(){
+  const title=document.getElementById('fsm-title').value.trim();
+  const count=parseInt(document.getElementById('fsm-count').value)||0;
+  if(!title){ toast('Inserisci il titolo della saga','error'); return; }
+  if(count<1){ toast('Inserisci il numero di film (min 1)','error'); return; }
+  if(!db.filmSeries) db.filmSeries=[];
+  db.filmSeries.push({id:crypto.randomUUID(),title,count,addedAt:Date.now()});
+  document.getElementById('fsm-title').value='';
+  document.getElementById('fsm-count').value='';
+  save();
+  renderFilmSeriesManagerList();
+  toast('Saga aggiunta ✓','success');
+}
+function removeFilmSeries(id){
+  // Dissocia film da questa saga
+  (db.films||[]).forEach(f=>{ if(f.seriesId===id){ f.seriesId=null; f.seriesOrder=null; } });
+  (db.filmsCompleted||[]).forEach(f=>{ if(f.seriesId===id){ f.seriesId=null; f.seriesOrder=null; } });
+  db.filmSeries=(db.filmSeries||[]).filter(x=>x.id!==id);
+  save();
+  renderFilmSeriesManagerList();
+  renderFilms();
+  toast('Saga rimossa','info');
+}
+function renderFilmSeriesManagerList(){
+  const el=document.getElementById('fsm-list'); if(!el) return;
+  const sagas=db.filmSeries||[];
+  if(!sagas.length){ el.innerHTML='<div style="text-align:center;padding:12px;font-size:0.78rem;color:var(--muted)">Nessuna saga film</div>'; return; }
+  el.innerHTML=sagas.map(s=>{
+    const assigned=countAssigned(s.id);
+    const isFull=assigned>=s.count;
+    return `<div class="saga-manager-item">
+      <div class="saga-manager-title">${escHtml(s.title)}</div>
+      <div class="saga-manager-count${isFull?' full':''}">${assigned}/${s.count}</div>
+      <button class="saga-manager-remove" onclick="removeFilmSeries('${s.id}')">✕</button>
+    </div>`;
+  }).join('');
+}
+
+// ---- Add Film ----
+function openAddFilmPopup(){
+  populateFilmSagaSelect('film-add-series','');
+  document.getElementById('film-add-order-wrap').style.display='none';
+  document.getElementById('film-add-auto-order').value='';
+  document.getElementById('addFilmPopup').classList.add('open');
+  setTimeout(()=>document.getElementById('film-add-title').focus(),150);
+}
+function closeAddFilmPopup(){
+  document.getElementById('addFilmPopup').classList.remove('open');
+  document.getElementById('film-add-title').value='';
+  document.getElementById('film-add-notes').value='';
+  document.getElementById('film-add-order-wrap').style.display='none';
+  document.getElementById('film-add-auto-order').value='';
+}
+document.getElementById('addFilmPopup').addEventListener('click',e=>{ if(e.target===document.getElementById('addFilmPopup')) closeAddFilmPopup(); });
+
+function addFilm(){
+  const title=document.getElementById('film-add-title').value.trim();
+  const type=document.getElementById('film-add-type').value;
+  const seriesId=document.getElementById('film-add-series').value;
+  const notes=document.getElementById('film-add-notes').value.trim();
+  if(!title){ toast('Inserisci un titolo','error'); return; }
+
+  let seriesOrder=null;
+  if(seriesId){
+    const autoOrder=document.getElementById('film-add-auto-order').value;
+    const orderWrap=document.getElementById('film-add-order-wrap');
+    if(autoOrder){
+      seriesOrder=parseInt(autoOrder);
+    } else if(orderWrap.style.display!=='none'){
+      const selOrd=document.getElementById('film-add-order').value;
+      if(!selOrd){ toast('Seleziona la posizione nella saga','error'); return; }
+      seriesOrder=parseInt(selOrd);
+    }
+  }
+
+  if(!db.films) db.films=[];
+  db.films.push({id:crypto.randomUUID(),title,type,seriesId:seriesId||null,seriesOrder,notes,addedAt:Date.now()});
+  save(); renderFilms();
+  closeAddFilmPopup();
+  toast('Film aggiunto ✓','success');
+}
+
+// ---- Edit Film ----
+let _editFilmId=null;
+function openEditFilmPopup(id, fromCompleted=false){
+  const list=fromCompleted?(db.filmsCompleted||[]):(db.films||[]);
+  const f=list.find(x=>x.id===id); if(!f) return;
+  _editFilmId=id;
+  _editFilmFromCompleted=fromCompleted;
+
+  populateFilmSagaSelect('ef-series', f.seriesId||'', id);
+  // trigger order selector update
+  document.getElementById('ef-order-wrap').style.display='none';
+  document.getElementById('ef-auto-order').value='';
+  onFilmSagaChange('ef-series','ef-order-wrap','ef-order','ef-auto-order', id);
+
+  // Set current position in selector if visible
+  if(f.seriesId && f.seriesOrder){
+    const orderWrap=document.getElementById('ef-order-wrap');
+    const orderSel=document.getElementById('ef-order');
+    const autoOrder=document.getElementById('ef-auto-order');
+    if(orderWrap.style.display!=='none'){
+      // Try to select current position
+      for(let opt of orderSel.options){
+        if(parseInt(opt.value)===f.seriesOrder){ opt.selected=true; break; }
+      }
+    } else if(autoOrder.value){
+      // auto-assigned, keep it
+    }
+  }
+
+  document.getElementById('ef-title').value=f.title;
+  document.getElementById('ef-type').value=f.type;
+  document.getElementById('ef-notes').value=f.notes||'';
+  document.getElementById('editFilmPopup').classList.add('open');
+  setTimeout(()=>document.getElementById('ef-title').focus(),150);
+}
+let _editFilmFromCompleted=false;
+function closeEditFilmPopup(){
+  document.getElementById('editFilmPopup').classList.remove('open');
+  _editFilmId=null;
+  _editFilmFromCompleted=false;
+}
+document.getElementById('editFilmPopup').addEventListener('click',e=>{ if(e.target===document.getElementById('editFilmPopup')) closeEditFilmPopup(); });
+
+function saveEditFilm(){
+  if(!_editFilmId) return;
+  const list=_editFilmFromCompleted?(db.filmsCompleted||[]):(db.films||[]);
+  const f=list.find(x=>x.id===_editFilmId); if(!f) return;
+  const newTitle=document.getElementById('ef-title').value.trim();
+  if(!newTitle){ toast('Inserisci un titolo','error'); return; }
+
+  const newSeriesId=document.getElementById('ef-series').value||null;
+  let seriesOrder=null;
+  if(newSeriesId){
+    const autoOrder=document.getElementById('ef-auto-order').value;
+    const orderWrap=document.getElementById('ef-order-wrap');
+    if(autoOrder){
+      seriesOrder=parseInt(autoOrder);
+    } else if(orderWrap.style.display!=='none'){
+      const selOrd=document.getElementById('ef-order').value;
+      if(!selOrd){ toast('Seleziona la posizione nella saga','error'); return; }
+      seriesOrder=parseInt(selOrd);
+    } else {
+      // keep old order if same series
+      if(newSeriesId===f.seriesId) seriesOrder=f.seriesOrder;
+    }
+  }
+
+  f.title=newTitle;
+  f.type=document.getElementById('ef-type').value;
+  f.seriesId=newSeriesId;
+  f.seriesOrder=seriesOrder;
+  f.notes=document.getElementById('ef-notes').value.trim();
+  save(); renderFilms();
+  closeEditFilmPopup();
+  toast('Film aggiornato ✓','success');
+}
+
+// ---- Film complete/restore/remove ----
+function completeFilm(id){
+  if(!db.films) return;
+  const idx=db.films.findIndex(x=>x.id===id); if(idx===-1) return;
+  const f=db.films.splice(idx,1)[0];
+  if(!db.filmsCompleted) db.filmsCompleted=[];
+  db.filmsCompleted.push({...f,completedAt:Date.now()});
+  save(); renderFilms(); toast(`✓ Film completato: ${f.title}`,'success');
+}
+function restoreFilm(id){
+  if(!db.filmsCompleted) return;
+  const idx=db.filmsCompleted.findIndex(x=>x.id===id); if(idx===-1) return;
+  const f=db.filmsCompleted.splice(idx,1)[0];
+  delete f.completedAt;
+  if(!db.films) db.films=[];
+  db.films.push(f);
+  save(); renderFilms(); toast('Film riportato in catalogo','info');
+}
+function removeFilmCompleted(id){
+  if(!db.filmsCompleted) return;
+  db.filmsCompleted=db.filmsCompleted.filter(x=>x.id!==id);
+  save(); renderFilms(); toast('Film rimosso','info');
+}
+
+// ---- Film menus ----
+function openFilmCatalogMenu(id){
+  const f=(db.films||[]).find(x=>x.id===id); if(!f) return;
+  const rec=f.seriesId?getSeriesRecord(f.seriesId):null;
+  const sagaName=rec?rec.title:'stand-alone';
+  openActionSheet(f.title,`${f.type} · ${sagaName}`,[
+    { icon:'✓', iconBg:'green-bg', cls:'green', label:'Segna come completato', action:()=>completeFilm(id) },
+    { icon:'✎', iconBg:'blue-bg', cls:'blue', label:'Modifica', action:()=>openEditFilmPopup(id,false) },
+    { icon:'✕', iconBg:'red-bg', cls:'red', label:'Rimuovi', action:()=>{ if(!db.films)return; db.films=db.films.filter(x=>x.id!==id); save(); renderFilms(); toast('Film rimosso','info'); } },
+  ]);
+}
+function openFilmCompletedMenu(id){
+  const f=(db.filmsCompleted||[]).find(x=>x.id===id); if(!f) return;
+  const date=new Date(f.completedAt).toLocaleDateString('it-IT');
+  openActionSheet(f.title,`${f.type} · completato il ${date}`,[
+    { icon:'✎', iconBg:'blue-bg', cls:'blue', label:'Modifica', action:()=>openEditFilmPopup(id,true) },
+    { icon:'↩', iconBg:'amber-bg', cls:'amber', label:'Riporta in catalogo', action:()=>restoreFilm(id) },
+    { icon:'✕', iconBg:'red-bg', cls:'red', label:'Rimuovi definitivamente', action:()=>removeFilmCompleted(id) },
+  ]);
+}
+
+// ---- Render Films ----
+function renderFilms(){
+  if(!db.films) db.films=[];
+  if(!db.filmsCompleted) db.filmsCompleted=[];
+  if(!db.filmSeries) db.filmSeries=[];
+
+  const q=(document.getElementById('filmSearch')?.value||'').toLowerCase();
+  const sort=document.getElementById('filmSort')?.value||'title';
+  let data=db.films.filter(f=>!q||f.title.toLowerCase().includes(q));
+
+  if(sort==='title') data.sort((a,b)=>a.title.localeCompare(b.title));
+  else if(sort==='recent') data.sort((a,b)=>(b.addedAt||0)-(a.addedAt||0));
+  else if(sort==='series'){
+    data.sort((a,b)=>{
+      const recA=a.seriesId?getSeriesRecord(a.seriesId):null;
+      const recB=b.seriesId?getSeriesRecord(b.seriesId):null;
+      const sa=recA?recA.title:'zzz';
+      const sb=recB?recB.title:'zzz';
+      return sa.localeCompare(sb)||(a.seriesOrder||999)-(b.seriesOrder||999)||a.title.localeCompare(b.title);
+    });
+  }
+
+  const standalone=data.filter(f=>!f.seriesId);
+  const withSaga=data.filter(f=>!!f.seriesId);
+
+  // Group by saga
+  const sagaGroups={};
+  withSaga.forEach(f=>{
+    if(!sagaGroups[f.seriesId]) sagaGroups[f.seriesId]=[];
+    sagaGroups[f.seriesId].push(f);
+  });
+  // Sort within each group by seriesOrder
+  Object.values(sagaGroups).forEach(arr=>arr.sort((a,b)=>(a.seriesOrder||999)-(b.seriesOrder||999)));
+
+  // Stats
+  document.getElementById('filmStats').innerHTML=`
+    <div class="stat-pill"><span class="dot blue"></span> Totale: <strong>${db.films.length}</strong></div>
+    <div class="stat-pill"><span class="dot amber"></span> Stand-alone: <strong>${db.films.filter(f=>!f.seriesId).length}</strong></div>
+    <div class="stat-pill"><span class="dot" style="background:var(--blue);box-shadow:0 0 4px var(--blue)"></span> In saga: <strong>${db.films.filter(f=>!!f.seriesId).length}</strong></div>
+    <div class="stat-pill"><span class="dot green"></span> Completati: <strong>${db.filmsCompleted.length}</strong></div>`;
+
+  const el=document.getElementById('film-list');
+  if(!data.length){ el.innerHTML='<div class="empty"><div class="empty-icon">🎬</div>Nessun film in catalogo</div>'; }
+  else {
+    const buildFilmItem=(f,i,showBadge=false,insideSaga=false)=>{
+      const rec=f.seriesId?getSeriesRecord(f.seriesId):null;
+      const typeColor=f.type==='DUB'?'var(--dub-color)':'var(--sub-color)';
+      const tagHtml=(rec&&!insideSaga)
+        ?`<span class="film-tag da-serie">${rec._source==='anime'?'📺 anime':'🎬 saga'}</span>`
+        :(!rec?`<span class="film-tag standalone">stand-alone</span>`:'');
+      const orderBadge=(showBadge&&f.seriesOrder!=null)?`<span class="film-order-badge">${f.seriesOrder}°</span>`:'';
+      const serieNameHtml=(rec&&!insideSaga)?`<div class="film-serie-name">${rec._source==='anime'?'📺':'🎬'} ${escHtml(rec.title)}</div>`:'';
+      const notesHtml=f.notes?`<div class="item-notes-row">📝 ${escHtml(f.notes)}</div>`:'';
+      return `<div class="rm-item" data-id="${f.id}" style="animation:itemIn .2s ${i*0.025}s both">
+        <div class="rm-num">${String(i+1).padStart(2,'0')}</div>
+        <div class="rm-info">
+          <div style="display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap;">
+            <div class="rm-name" style="flex:1;min-width:0">${escHtml(f.title)}</div>
+            ${orderBadge}
+          </div>
+          <div class="item-tags" style="margin-top:4px">${tagHtml}<span class="film-tag" style="color:${typeColor};background:${f.type==='DUB'?'var(--dub-bg)':'var(--sub-bg)'};border:1px solid ${f.type==='DUB'?'var(--dub-border)':'var(--sub-border)'}">${f.type}</span></div>
+          ${serieNameHtml}${notesHtml}
+        </div>
+        <div class="rm-actions">
+          <button class="menu-btn" onclick="event.stopPropagation();openFilmCatalogMenu('${f.id}')">···</button>
+        </div>
+      </div>`;
+    };
+
+    let html='';
+    let idx=0;
+
+    // Render saga blocks
+    Object.entries(sagaGroups).forEach(([sagaId, films])=>{
+      const rec=getSeriesRecord(sagaId);
+      const sagaTitle=rec?rec.title:sagaId;
+      const isAnime=rec&&rec._source==='anime';
+      const showOrderBadge=(rec&&rec.count>=2);
+      const typeLabel=isAnime?'anime':'film';
+      html+=`<div class="film-saga-block">
+        <div class="film-saga-header">
+          ${isAnime?'📺':'🎬'} ${escHtml(sagaTitle)}
+          <span class="saga-type-badge ${typeLabel}">${typeLabel}</span>
+        </div>`;
+      films.forEach((f,i)=>{ html+=buildFilmItem(f,idx++,showOrderBadge,true); });
+      html+='</div>';
+    });
+
+    // Standalone films
+    if(standalone.length){
+      if(Object.keys(sagaGroups).length>0){
+        html+='<div class="section-label" style="margin:10px 0 6px;">Stand-alone</div>';
+      }
+      standalone.forEach((f,i)=>{ html+=buildFilmItem(f,idx++,false); });
+    }
+
+    el.innerHTML=html;
+  }
+
+  // Completati
+  const clabel=document.getElementById('film-completed-label');
+  const cel=document.getElementById('film-completed-list');
+  if(!db.filmsCompleted.length){ clabel.style.display='none'; cel.innerHTML=''; return; }
+  clabel.style.display='flex';
+  cel.innerHTML=db.filmsCompleted.map((f,i)=>{
+    const rec=f.seriesId?getSeriesRecord(f.seriesId):null;
+    const date=new Date(f.completedAt).toLocaleDateString('it-IT');
+    const typeColor=f.type==='DUB'?'var(--dub-color)':'var(--sub-color)';
+    const orderBadge=(rec&&rec.count>=2&&f.seriesOrder!=null)?`<span class="film-order-badge">${f.seriesOrder}°</span>`:'';
+    return `<div class="film-completed-item" data-id="${f.id}" style="animation:itemIn .2s ${i*0.025}s both">
+      <div class="check-mark">✓</div>
+      <div class="rm-info">
+        <div style="display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap;">
+          <div class="rm-name">${escHtml(f.title)}</div>
+          ${orderBadge}
+        </div>
+        <div class="rm-meta">${date} · <span style="color:${typeColor}">${f.type}</span>${rec?` · ${escHtml(rec.title)}`:''}</div>
+      </div>
+      <div class="rm-actions">
+        <button class="menu-btn" onclick="event.stopPropagation();openFilmCompletedMenu('${f.id}')">···</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ---- KEYBOARD + CLICK OUTSIDE ----
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape'){
+    closeEditModal();
+    closeActionSheet();
+    closeAddSeriesPopup();
+    closeAddFilmPopup();
+    closeEditFilmPopup();
+    closeFilmSeriesManager();
+    closeSettingsDropdown();
+  }
+  if(e.key==='Enter'){
+    if(document.getElementById('addSeriesPopup').classList.contains('open')){ addSeries(); }
+    else if(document.getElementById('addFilmPopup').classList.contains('open')){ addFilm(); }
+    else if(document.getElementById('editFilmPopup').classList.contains('open')){ saveEditFilm(); }
+    else if(document.getElementById('editModal').classList.contains('open')){ saveEditModal(); }
+  }
+});
+document.addEventListener('click', e => {
+  if (_actionSheetOpen && !e.target.closest('#actionSheet')) closeActionSheet();
+  if(!e.target.closest('.settings-wrap')) closeSettingsDropdown();
+});
+function closeAllEditDropdowns(){ closeEditModal(); }
+function clearEpFilter(){ document.getElementById('epFilterInput').value=''; renderCatalog(); }
+
+// ---- INIT ----
+loadTheme();
+loadLocal();
+renderAll();
+syncPull();
+startSyncPoll();
+</script>
+</body>
+</html>
