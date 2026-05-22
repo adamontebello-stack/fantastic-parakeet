@@ -482,6 +482,30 @@ input[type="number"] { -moz-appearance: textfield; }
 }
 .item-btn.danger:active { background: var(--red); border-color: var(--red); }
 
+/* ===== FAV BUTTON ===== */
+.item-btn.fav-btn {
+  color: var(--muted);
+  font-size: 1.05rem;
+  width: 28px; height: 34px;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+.item-btn.fav-btn.active {
+  color: #ffd700;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: 0 0 6px rgba(255,215,0,0.5);
+}
+.item-btn.fav-btn:hover,
+.item-btn.fav-btn:active {
+  color: #ffd700;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: 0 0 6px rgba(255,215,0,0.5);
+  transform: scale(1.2);
+}
+
 /* Edit dropdown on mobile — slides up from bottom as sheet */
 .edit-dropdown {
   position: fixed; left: 0; right: 0; bottom: 0;
@@ -1859,6 +1883,18 @@ function addSeries(){
   toast('Serie aggiunta ✓','success');
 }
 function removeSeries(id){ db.series=db.series.filter(s=>s.id!==id); save(); renderCatalog(); toast('Serie rimossa','info'); }
+function toggleFavorite(id){
+  const s=db.series.find(x=>x.id===id); if(!s) return;
+  s.favorite=!s.favorite;
+  save();
+  const itemEl=document.getElementById('item-'+id);
+  if(itemEl){
+    const btn=itemEl.querySelector('.fav-btn');
+    if(btn) btn.classList.toggle('active', !!s.favorite);
+  }
+  updateCatalogStats();
+  toast(s.favorite?`★ ${s.title} aggiunto ai preferiti`:`${s.title} rimosso dai preferiti`, s.favorite?'success':'info');
+}
 function addToRoadmap(id){
   const s=db.series.find(x=>x.id===id);
   if(!s||s.inRoadmap){ toast('Già in roadmap','error'); return; }
@@ -1887,6 +1923,7 @@ function renderList(id,data){
       +'</div>'
       +'<div class="item-eps">'+s.eps+'</div>'
       +'<div class="item-actions">'
+        +'<button class="item-btn fav-btn'+(s.favorite?' active':'')+'" onclick="event.stopPropagation();toggleFavorite(\''+s.id+'\')" title="Preferito">★</button>'
         +'<button class="menu-btn" onclick="event.stopPropagation();openCatalogMenu(\''+s.id+'\')">···</button>'
       +'</div>'
     +'</div>';
@@ -1907,9 +1944,17 @@ function renderCatalog(){
   document.getElementById('sub-count').textContent=subs.length;
   const all=db.series;
   const totalEps=all.reduce((a,s)=>a+s.eps,0);
-  document.getElementById('catalogStats').innerHTML=`<div class="stat-pill"><span class="dot"></span> Totale: <strong>${all.length}</strong></div><div class="stat-pill"><span class="dot blue"></span> DUB: <strong>${all.filter(s=>s.type==='DUB').length}</strong></div><div class="stat-pill"><span class="dot red"></span> SUB: <strong>${all.filter(s=>s.type==='SUB').length}</strong></div><div class="stat-pill"><span class="dot amber"></span> Ep totali: <strong>${totalEps}</strong></div>`;
+  updateCatalogStats();
   renderList('dub-list',dubs);
   renderList('sub-list',subs);
+}
+
+function updateCatalogStats(){
+  const all=db.series;
+  const totalEps=all.reduce((a,s)=>a+s.eps,0);
+  const favCount=all.filter(s=>s.favorite).length;
+  const favPill=favCount>0?`<div class="stat-pill"><span style="color:#ffd700;font-size:0.75rem">★</span> Preferiti: <strong>${favCount}</strong></div>`:'';
+  document.getElementById('catalogStats').innerHTML=`<div class="stat-pill"><span class="dot"></span> Totale: <strong>${all.length}</strong></div><div class="stat-pill"><span class="dot blue"></span> DUB: <strong>${all.filter(s=>s.type==='DUB').length}</strong></div><div class="stat-pill"><span class="dot red"></span> SUB: <strong>${all.filter(s=>s.type==='SUB').length}</strong></div><div class="stat-pill"><span class="dot amber"></span> Ep totali: <strong>${totalEps}</strong></div>${favPill}`;
 }
 
 // Global edit modal
@@ -1972,11 +2017,18 @@ function addRandom(forceType){
   const required=forceType||PATTERN[db.patternIndex];
   const pool=db.series.filter(s=>!s.inRoadmap&&s.type===required);
   if(!pool.length){ toast(`Nessuna serie ${required} disponibile`,'error'); return; }
-  const picked=pool[Math.floor(Math.random()*pool.length)];
+  // Weighted random: favorites have weight 3, others weight 1
+  const weights=pool.map(s=>s.favorite?3:1);
+  const totalWeight=weights.reduce((a,w)=>a+w,0);
+  let r=Math.random()*totalWeight;
+  let picked=pool[pool.length-1];
+  for(let i=0;i<pool.length;i++){ r-=weights[i]; if(r<=0){ picked=pool[i]; break; } }
   picked.inRoadmap=true;
   db.roadmap.push({id:picked.id,title:picked.title,eps:picked.eps,type:picked.type,status:'normal',currentEp:0});
   if(!forceType) db.patternIndex=(db.patternIndex+1)%PATTERN.length;
-  save(); renderAll(); toast(`Aggiunto: ${picked.title}`,'success');
+  save(); renderAll();
+  const label=picked.favorite?`★ ${picked.title}`:`${picked.title}`;
+  toast(`Aggiunto: ${label}`,'success');
 }
 function setWatching(id){
   const item=db.roadmap.find(r=>r.id===id);
