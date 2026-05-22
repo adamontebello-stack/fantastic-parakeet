@@ -1316,8 +1316,123 @@ main {
   box-shadow: 0 0 0 2px var(--accentGlow);
 }
 
+/* ===== FAVORITE STAR ===== */
+.fav-btn {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--muted);
+  font-size: 1rem;
+  opacity: 0.4;
+  padding: 2px 4px;
+  width: auto !important;
+  height: auto !important;
+  transition: color 0.18s, opacity 0.18s, transform 0.18s, text-shadow 0.18s;
+  cursor: pointer;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.fav-btn.active {
+  color: #ffd700;
+  opacity: 1;
+  text-shadow: 0 0 8px rgba(255,215,0,0.9), 0 0 20px rgba(255,215,0,0.5);
+  transform: scale(1.1);
+}
+.fav-btn:hover {
+  color: #ffd700 !important;
+  opacity: 1 !important;
+  transform: scale(1.2) !important;
+  text-shadow: 0 0 8px rgba(255,215,0,0.7) !important;
+}
 
-
+/* ===== SERIES DETAIL POPUP ===== */
+.series-detail-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 650;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.series-detail-overlay.open {
+  display: flex;
+  animation: fadeIn 0.18s ease;
+}
+.series-detail-box {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 24px;
+  width: 92%;
+  max-width: 430px;
+  max-height: 84vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 28px 70px rgba(0,0,0,0.55), 0 0 0 1px var(--border), 0 0 40px var(--accentGlow);
+  animation: modalSlide 0.22s cubic-bezier(0.34,1.4,0.64,1);
+}
+.sd-header {
+  padding: 1.2rem 1.4rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  position: relative;
+}
+.sd-tags { display: flex; align-items: center; gap: 7px; margin-bottom: 7px; flex-wrap: wrap; }
+.sd-title { font-size: 1.05rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text); line-height: 1.3; padding-right: 2rem; }
+.sd-close {
+  position: absolute; top: 0.9rem; right: 1rem;
+  background: var(--surface3); border: 1px solid var(--border);
+  color: var(--muted2); width: 27px; height: 27px; border-radius: 8px;
+  cursor: pointer; font-size: 0.75rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.18s;
+}
+.sd-close:hover { background: var(--accent); border-color: var(--accent); color: white; }
+.sd-body {
+  padding: 1rem 1.4rem;
+  overflow-y: auto;
+  flex: 1;
+  display: flex; flex-direction: column; gap: 11px;
+}
+.sd-stats {
+  display: flex; gap: 8px;
+}
+.sd-stat {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 11px; padding: 8px 13px;
+  display: flex; flex-direction: column; gap: 2px; flex: 1;
+}
+.sd-stat-label { font-size: 0.58rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+.sd-stat-value { font-size: 0.86rem; font-weight: 700; color: var(--text); }
+.sd-section-label { font-size: 0.6rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 5px; }
+.sd-notes {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 11px; padding: 10px 13px;
+  font-size: 0.79rem; color: var(--muted2);
+  font-family: 'DM Mono', monospace;
+  line-height: 1.55; white-space: pre-wrap; word-break: break-word;
+}
+.sd-films-list { display: flex; flex-direction: column; gap: 5px; }
+.sd-film-item {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 7px 11px;
+}
+.sd-film-order {
+  font-family: 'DM Mono', monospace; font-size: 0.6rem;
+  color: var(--muted2); background: var(--surface3);
+  border: 1px solid var(--border); padding: 2px 6px; border-radius: 20px;
+  flex-shrink: 0;
+}
+.sd-film-title { flex: 1; font-size: 0.78rem; font-weight: 700; }
+.sd-footer {
+  padding: 0.85rem 1.4rem;
+  border-top: 1px solid var(--border);
+  display: flex; gap: 7px; flex-shrink: 0; align-items: center;
+}
+.sd-footer .btn { padding: 9px 12px; font-size: 0.76rem; }
 
 </style>
 </head>
@@ -1508,6 +1623,19 @@ main {
 
 </div>
 </main>
+
+<!-- ===== SERIES DETAIL POPUP ===== -->
+<div class="series-detail-overlay" id="seriesDetailOverlay" onclick="handleSdOverlayClick(event)">
+  <div class="series-detail-box">
+    <div class="sd-header">
+      <div class="sd-tags" id="sdTags"></div>
+      <div class="sd-title" id="sdTitle"></div>
+      <button class="sd-close" onclick="closeSeriesDetail()">✕</button>
+    </div>
+    <div class="sd-body" id="sdBody"></div>
+    <div class="sd-footer" id="sdFooter"></div>
+  </div>
+</div>
 
 <!-- ===== ADD SERIES MODAL ===== -->
 <div class="edit-modal-overlay" id="addSeriesModal" onclick="handleAddSeriesOverlayClick(event)">
@@ -1848,7 +1976,7 @@ function _resetAddOngoing(){
 
 function buildItemHTML(s, i){
   return `
-    <div class="item" style="animation:itemIn .2s ${i*0.025}s both" id="item-${s.id}">
+    <div class="item" style="animation:itemIn .2s ${i*0.025}s both;cursor:pointer;" id="item-${s.id}" onclick="openSeriesDetail('${s.id}')">
       <div class="item-num">${i+1}</div>
       <div class="item-info">
         <div class="item-title">${s.title}</div>
@@ -1857,12 +1985,103 @@ function buildItemHTML(s, i){
       ${s.ongoing ? `<span class="ongoing-tag">▶ In corso</span>` : ''}
       ${s.films ? `<span class="film-tag">🎬 ${s.films} film</span>` : ''}
       <div class="item-eps">${s.eps} ep</div>
-      <div class="item-actions">
-        <button class="item-btn" onclick="addToRoadmap('${s.id}')" title="Aggiungi roadmap">＋</button>
-        <button class="item-btn" onclick="openEditModal('${s.id}')" title="Modifica">✎</button>
-        <button class="item-btn danger" onclick="removeSeries('${s.id}')" title="Rimuovi">✕</button>
-      </div>
+      <button class="fav-btn ${s.favorite ? 'active' : ''}" onclick="event.stopPropagation();toggleFavorite('${s.id}')" title="Preferito">★</button>
     </div>`;
+}
+
+function toggleFavorite(id){
+  const s = db.series.find(s=>s.id===id);
+  if(!s) return;
+  s.favorite = !s.favorite;
+  save();
+  const item = document.getElementById('item-'+id);
+  if(item){
+    const btn = item.querySelector('.fav-btn');
+    if(btn){ btn.classList.toggle('active', s.favorite); }
+  }
+  const sdBtn = document.getElementById('sdFavBtn');
+  if(sdBtn){ sdBtn.classList.toggle('active', s.favorite); sdBtn.title = s.favorite ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'; }
+  updateCatalogStats();
+  toast(s.favorite ? `★ Preferito: ${s.title}` : `☆ Rimosso: ${s.title}`, 'success');
+}
+
+// ---- SERIES DETAIL POPUP ----
+let _detailSeriesId = null;
+
+function openSeriesDetail(id){
+  const s = db.series.find(x=>x.id===id);
+  if(!s) return;
+  _detailSeriesId = id;
+
+  // Tags row
+  const tagsEl = document.getElementById('sdTags');
+  tagsEl.innerHTML =
+    `<span class="badge ${s.type.toLowerCase()}">${s.type}</span>` +
+    (s.ongoing ? '<span class="ongoing-tag">▶ In corso</span>' : '') +
+    (s.films  ? `<span class="film-tag">🎬 ${s.films} film</span>` : '');
+
+  document.getElementById('sdTitle').textContent = s.title;
+
+  // Body
+  const body = document.getElementById('sdBody');
+  let html = '';
+
+  // Stats
+  html += '<div class="sd-stats">';
+  html += `<div class="sd-stat"><div class="sd-stat-label">Episodi</div><div class="sd-stat-value">${s.eps}</div></div>`;
+  html += `<div class="sd-stat"><div class="sd-stat-label">Tipo</div><div class="sd-stat-value">${s.type}</div></div>`;
+  html += `<div class="sd-stat"><div class="sd-stat-label">Aggiunta</div><div class="sd-stat-value">${s.addedAt ? new Date(s.addedAt).toLocaleDateString('it-IT') : '—'}</div></div>`;
+  html += '</div>';
+
+  // Notes
+  if(s.notes){
+    html += '<div>';
+    html += '<div class="sd-section-label">📋 Note / Watch Order</div>';
+    html += `<div class="sd-notes">${s.notes.replace(/</g,'&lt;')}</div>`;
+    html += '</div>';
+  }
+
+  // Linked films (saga match by title)
+  const allFilms = [...(db.films||[]), ...(db.filmsCompleted||[])];
+  const completedFilmIds = new Set((db.filmsCompleted||[]).map(f=>f.id));
+  const linked = allFilms.filter(f=>{
+    if(!f.seriesId) return false;
+    const fs = (db.filmSeries||[]).find(x=>x.id===f.seriesId);
+    if(!fs) return false;
+    const st=s.title.toLowerCase(), ft=fs.title.toLowerCase();
+    return st.includes(ft)||ft.includes(st)||st.split(' ').some(w=>w.length>3&&ft.includes(w));
+  }).sort((a,b)=>(a.seriesOrder||99)-(b.seriesOrder||99));
+
+  if(linked.length){
+    html += '<div>';
+    html += `<div class="sd-section-label">🎬 Film collegati (${linked.length})</div>`;
+    html += '<div class="sd-films-list">';
+    linked.forEach(f=>{
+      const ord = f.seriesOrder ? `<span class="sd-film-order">${getOrdinal(f.seriesOrder)}</span>` : '';
+      const done = completedFilmIds.has(f.id) ? `<span style="color:var(--green);font-size:0.75rem;margin-left:auto;">✓</span>` : '';
+      html += `<div class="sd-film-item">${ord}<span class="sd-film-title">${f.title}</span><span class="badge ${f.type.toLowerCase()}" style="font-size:0.55rem;padding:2px 6px;">${f.type}</span>${done}</div>`;
+    });
+    html += '</div></div>';
+  }
+
+  body.innerHTML = html;
+
+  // Footer
+  document.getElementById('sdFooter').innerHTML =
+    `<button class="fav-btn ${s.favorite?'active':''}" id="sdFavBtn" onclick="toggleFavorite('${s.id}')" title="${s.favorite?'Rimuovi dai preferiti':'Aggiungi ai preferiti'}" style="font-size:1.2rem;padding:4px 8px;">★</button>
+     <button class="btn btn-ghost btn-sm" onclick="closeSeriesDetail();addToRoadmap('${s.id}')" style="flex:1;">＋ Roadmap</button>
+     <button class="btn btn-ghost btn-sm" onclick="closeSeriesDetail();openEditModal('${s.id}')" style="flex:1;">✎ Modifica</button>
+     <button class="btn btn-sm" onclick="closeSeriesDetail();removeSeries('${s.id}')" style="background:var(--red);border:none;box-shadow:0 4px 12px rgba(255,59,74,0.35);flex:0 0 auto;">✕</button>`;
+
+  document.getElementById('seriesDetailOverlay').classList.add('open');
+}
+
+function closeSeriesDetail(){
+  document.getElementById('seriesDetailOverlay').classList.remove('open');
+  _detailSeriesId = null;
+}
+function handleSdOverlayClick(e){
+  if(e.target===document.getElementById('seriesDetailOverlay')) closeSeriesDetail();
 }
 
 function addSeries(){
@@ -1946,7 +2165,9 @@ function addToRoadmap(id){
 function updateCatalogStats(){
   const all=db.series;
   const totalEps=all.reduce((a,s)=>a+s.eps,0);
-  document.getElementById('catalogStats').innerHTML=`<div class="stat-pill"><span class="dot"></span> Totale: <strong>${all.length}</strong></div><div class="stat-pill"><span class="dot blue"></span> DUB: <strong>${all.filter(s=>s.type==='DUB').length}</strong></div><div class="stat-pill"><span class="dot red"></span> SUB: <strong>${all.filter(s=>s.type==='SUB').length}</strong></div><div class="stat-pill"><span class="dot amber"></span> Ep totali: <strong>${totalEps}</strong></div>`;
+  const favCount=all.filter(s=>s.favorite).length;
+  const favPill = favCount>0 ? `<div class="stat-pill" style="color:#ffd700;border-color:rgba(255,215,0,0.3);">★ Preferiti: <strong>${favCount}</strong></div>` : '';
+  document.getElementById('catalogStats').innerHTML=`<div class="stat-pill"><span class="dot"></span> Totale: <strong>${all.length}</strong></div><div class="stat-pill"><span class="dot blue"></span> DUB: <strong>${all.filter(s=>s.type==='DUB').length}</strong></div><div class="stat-pill"><span class="dot red"></span> SUB: <strong>${all.filter(s=>s.type==='SUB').length}</strong></div><div class="stat-pill"><span class="dot amber"></span> Ep totali: <strong>${totalEps}</strong></div>${favPill}`;
 }
 
 function renderSortedSeries(list){
@@ -2016,7 +2237,7 @@ function saveEditModal(){
   toast('Serie aggiornata ✓','success');
   closeEditModal();
 }
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeEditModal(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeEditModal(); closeSeriesDetail(); } });
 
 function renderCatalog(){
   const q=(document.getElementById('catalogSearch')?.value||'').toLowerCase();
@@ -2038,7 +2259,11 @@ function addRandom(forceType){
   const required=forceType||PATTERN[db.patternIndex];
   const pool=db.series.filter(s=>!s.inRoadmap&&s.type===required);
   if(!pool.length){ toast(`Nessuna serie ${required} disponibile`,'error'); return; }
-  const picked=pool[Math.floor(Math.random()*pool.length)];
+  // Weighted: favorites 3x
+  const weights=pool.map(s=>s.favorite?3:1);
+  const total=weights.reduce((a,b)=>a+b,0);
+  let r=Math.random()*total, picked=pool[pool.length-1];
+  for(let i=0;i<pool.length;i++){ r-=weights[i]; if(r<=0){picked=pool[i];break;} }
   picked.inRoadmap=true;
   db.roadmap.push({id:picked.id,title:picked.title,eps:picked.eps,type:picked.type,status:'normal',currentEp:0});
   if(!forceType) db.patternIndex=(db.patternIndex+1)%PATTERN.length;
@@ -2056,7 +2281,7 @@ function addRandom(forceType){
     updateCatalogStats();
   }
   renderRoadmap();
-  toast(`Aggiunto: ${picked.title}`,'success');
+  toast(`${picked.favorite?'★ ':''}Aggiunto: ${picked.title}`,'success');
 }
 
 function buildRmItemHTML(r, i){
