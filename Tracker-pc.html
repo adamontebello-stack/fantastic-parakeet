@@ -392,7 +392,8 @@ nav {
 .sync-dot.syncing { background: var(--amber); animation: pulse 0.9s infinite; }
 @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
 @keyframes spin   { to { transform: rotate(360deg); } }
-.action-btn.syncing .sync-icon { animation: spin 1s linear infinite; }
+.action-btn.syncing .sync-icon,
+.settings-item.syncing .sync-icon { animation: spin 1s linear infinite; }
 
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
@@ -1959,14 +1960,27 @@ async function _pull(){
     setSyncState('ok'); return false;
   }catch(e){ setSyncState('err',e.message); return false; }
 }
-function syncPush(){ syncQueue=syncQueue.then(()=>_push()); }
-function syncPull(){ syncQueue=syncQueue.then(()=>_pull()); }
-async function manualSync(){ syncQueue=syncQueue.then(async()=>{ const p=await _pull(); if(!p) await _push(); }); }
-function setSyncState(state){
+function syncPush(){ syncQueue=syncQueue.then(()=>_push()).catch(()=>setSyncState('err','push failed')); }
+function syncPull(){ syncQueue=syncQueue.then(()=>_pull()).catch(()=>setSyncState('err','pull failed')); }
+async function manualSync(){ syncQueue=syncQueue.then(async()=>{ const p=await _pull(); if(!p) await _push(); }).catch(()=>setSyncState('err','sync failed')); }
+let _syncIconTimer = null;
+function setSyncState(state, _msg){
   const dot=document.getElementById('syncDot'),btn=document.getElementById('syncBtn'),icon=document.getElementById('syncIcon');
-  dot.className='sync-dot '+state;
-  if(state==='syncing') btn.classList.add('syncing');
-  else{ btn.classList.remove('syncing'); if(state==='ok'){ icon.textContent='✓'; setTimeout(()=>{ icon.textContent='⟳'; },1800); } }
+  if(!dot||!btn||!icon) return;
+  dot.className='sync-dot'+(state?' '+state:'');
+  if(state==='syncing'){
+    btn.classList.add('syncing');
+    if(_syncIconTimer){ clearTimeout(_syncIconTimer); _syncIconTimer=null; }
+  } else {
+    btn.classList.remove('syncing');
+    if(state==='ok'){
+      icon.textContent='✓';
+      if(_syncIconTimer) clearTimeout(_syncIconTimer);
+      _syncIconTimer=setTimeout(()=>{ icon.textContent='⟳'; _syncIconTimer=null; },1800);
+    } else if(state==='err'){
+      icon.textContent='⟳';
+    }
+  }
 }
 function startSyncPoll(){ if(syncTimer) clearInterval(syncTimer); syncTimer=setInterval(()=>{ if(db._updatedAt>lastPushedAt) syncPush(); else syncPull(); },30000); }
 function save(){ db._updatedAt=Date.now(); saveLocal(); clearTimeout(window._saveDebounce); window._saveDebounce=setTimeout(syncPush,1200); }
@@ -1995,11 +2009,19 @@ function showSection(event,id){
 
 // ---- ADD SERIES MODAL ----
 function openAddSeriesModal(){
+  // Ripristina ultimo tipo usato
+  const lastType = localStorage.getItem('st_lastSeriesType');
+  if(lastType){ const sel=document.getElementById('type'); if(sel) sel.value=lastType; }
   document.getElementById('addSeriesModal').classList.add('open');
   setTimeout(()=>{ const t=document.getElementById('title'); if(t) t.focus(); },80);
 }
 function closeAddSeriesModal(){
   document.getElementById('addSeriesModal').classList.remove('open');
+  // Reset completo solo alla chiusura
+  document.getElementById('title').value='';
+  document.getElementById('eps').value='';
+  document.getElementById('films').value='';
+  document.getElementById('notes').value='';
   _resetAddOngoing();
 }
 function handleAddSeriesOverlayClick(e){
@@ -2009,12 +2031,28 @@ function handleAddSeriesOverlayClick(e){
 // ---- ADD FILM MODAL ----
 function openAddFilmModal(){
   populateFilmSeriesSelect('filmSeriesSelect','filmOrderGroup','filmOrderSelect');
-  document.getElementById('filmOrderGroup').style.display='none';
+  // Ripristina ultimo tipo e saga usati
+  const lastType = localStorage.getItem('st_lastFilmType');
+  if(lastType){ const sel=document.getElementById('filmType'); if(sel) sel.value=lastType; }
+  const lastSeries = localStorage.getItem('st_lastFilmSeriesId');
+  if(lastSeries){
+    const sel=document.getElementById('filmSeriesSelect');
+    if(sel && [...sel.options].some(o=>o.value===lastSeries)){
+      sel.value=lastSeries; onFilmSeriesChange();
+    } else {
+      document.getElementById('filmOrderGroup').style.display='none';
+    }
+  } else {
+    document.getElementById('filmOrderGroup').style.display='none';
+  }
   document.getElementById('addFilmModal').classList.add('open');
   setTimeout(()=>{ const t=document.getElementById('filmTitle'); if(t) t.focus(); },80);
 }
 function closeAddFilmModal(){
   document.getElementById('addFilmModal').classList.remove('open');
+  // Reset completo solo alla chiusura
+  document.getElementById('filmTitle').value='';
+  document.getElementById('filmNotes').value='';
 }
 function handleAddFilmOverlayClick(e){
   if(e.target===document.getElementById('addFilmModal')) closeAddFilmModal();
@@ -2032,11 +2070,13 @@ document.addEventListener('keydown', function(e){
     closeSettingsMenu();
   }
   if(e.key === 'Enter'){
-    if(document.getElementById('addSeriesModal').classList.contains('open')){ e.preventDefault(); addSeries(); return; }
-    if(document.getElementById('addFilmModal').classList.contains('open')){ e.preventDefault(); addFilm(); return; }
-    if(document.getElementById('editFilmModal').classList.contains('open')){ e.preventDefault(); saveEditFilm(); return; }
-    if(document.getElementById('editSeriesModal').classList.contains('open')){ e.preventDefault(); saveEditModal(); return; }
-    if(document.getElementById('filmSeriesModal').classList.contains('open')){ e.preventDefault(); addFilmSeries(); return; }
+    const tag = e.target.tagName;
+    const isTextarea = tag === 'TEXTAREA';
+    if(document.getElementById('addSeriesModal').classList.contains('open') && !isTextarea){ e.preventDefault(); addSeries(); return; }
+    if(document.getElementById('addFilmModal').classList.contains('open') && !isTextarea){ e.preventDefault(); addFilm(); return; }
+    if(document.getElementById('editFilmModal').classList.contains('open') && !isTextarea){ e.preventDefault(); saveEditFilm(); return; }
+    if(document.getElementById('editSeriesModal').classList.contains('open') && !isTextarea){ e.preventDefault(); saveEditModal(); return; }
+    if(document.getElementById('filmSeriesModal').classList.contains('open') && !isTextarea){ e.preventDefault(); addFilmSeries(); return; }
   }
 });
 
@@ -2181,28 +2221,24 @@ function addSeries(){
   const newSeries={id:crypto.randomUUID(),title,eps,films,type,notes,ongoing,inRoadmap:false,addedAt:Date.now()};
   db.series.push(newSeries);
   save();
-  // Aggiorna solo la lista giusta e i contatori
+  localStorage.setItem('st_lastSeriesType', type);
   const listId = type==='DUB' ? 'dub-list' : 'sub-list';
   const countId = type==='DUB' ? 'dub-count' : 'sub-count';
   const listEl = document.getElementById(listId);
-  // Rimuovi empty se presente
   const empty = listEl.querySelector('.empty');
   if(empty) listEl.innerHTML='';
   const filtered = db.series.filter(s=>!s.inRoadmap&&s.type===type);
   const sorted = renderSortedSeries(filtered);
-  const idx = sorted.findIndex(s=>s.id===newSeries.id);
-  // Ricostruisce solo la lista interessata (lista piccola, nessuna scroll position persa sull'altra)
   listEl.innerHTML = sorted.map((s,i)=>buildItemHTML(s,i)).join('');
   document.getElementById(countId).textContent = sorted.length;
   updateCatalogStats();
-  // Reset form
+  // Reset solo titolo, episodi, film, note — mantieni tipo e ongoing
   document.getElementById('title').value='';
   document.getElementById('eps').value='';
   document.getElementById('films').value='';
   document.getElementById('notes').value='';
-  _resetAddOngoing();
+  setTimeout(()=>{ const t=document.getElementById('title'); if(t) t.focus(); },30);
   toast('Serie aggiunta ✓','success');
-  closeAddSeriesModal();
 }
 
 function removeSeries(id){
@@ -2780,10 +2816,10 @@ function getAnimeSagas(){
 function getAvailableFilmSeries(excludeFilmId=null, includeId=null){
   const series = (db.filmSeries||[]).sort((a,b)=>a.title.localeCompare(b.title));
   return series.filter(s=>{
-    if(s.id === includeId) return true; // always include current (for editing)
+    if(excludeFilmId && s.id === includeId) return true; // include sempre in modalità edit
     const used = [...(db.films||[]), ...(db.filmsCompleted||[])]
       .filter(f=>f.seriesId===s.id && f.id!==excludeFilmId).length;
-    return used < s.count; // show as long as there's at least one free slot
+    return used < s.count;
   });
 }
 
@@ -2810,7 +2846,6 @@ function populateFilmSeriesSelect(selectId='filmSeriesSelect', orderGroupId='fil
 
   // ---- Anime sagas (series with films >= 1) ----
   const animeSagas = getAnimeSagas().filter(s=>{
-    if(s.id === currentSeriesId) return true;
     const used = [...(db.films||[]), ...(db.filmsCompleted||[])]
       .filter(f=>f.seriesId===s.id && f.id!==excludeFilmId).length;
     return used < s.count;
@@ -2843,7 +2878,11 @@ function populateFilmSeriesSelect(selectId='filmSeriesSelect', orderGroupId='fil
     sel.appendChild(grpFilm);
   }
 
-  if(currentSeriesId) sel.value = currentSeriesId;
+  if(currentSeriesId){
+    // Riseleziona solo se la saga è ancora presente nella lista (non piena)
+    const stillAvailable = [...sel.options].some(o => o.value === currentSeriesId);
+    sel.value = stillAvailable ? currentSeriesId : '';
+  }
   // Populate order
   populateOrderSelect(selectId, orderGroupId, orderSelectId, excludeFilmId, currentOrder);
 }
@@ -2866,11 +2905,18 @@ function populateOrderSelect(selectId, orderGroupId, orderSelectId, excludeFilmI
     if(!usedOrders.includes(i) || i===currentOrder) freeSlots.push(i);
   }
 
-  // If only one slot available (or count=1), auto-assign silently — hide the selector
-  if(freeSlots.length <= 1){
-    const auto = freeSlots[0] || 1;
+  // Saga piena: nascondi ordine e deseleziona saga
+  if(freeSlots.length === 0){
     orderGroup.style.display='none';
-    orderSel.dataset.autoOrder = auto; // store for addFilm/saveEditFilm to read
+    orderSel.dataset.autoOrder = '';
+    sel.value = '';
+    return;
+  }
+
+  // Un solo slot libero: auto-assegna silenziosamente
+  if(freeSlots.length === 1){
+    orderGroup.style.display='none';
+    orderSel.dataset.autoOrder = freeSlots[0];
     return;
   }
 
@@ -2878,12 +2924,13 @@ function populateOrderSelect(selectId, orderGroupId, orderSelectId, excludeFilmI
   orderGroup.style.display='';
   orderSel.dataset.autoOrder = '';
   const ordinals = ['1°','2°','3°','4°','5°','6°','7°','8°','9°','10°','11°','12°','13°','14°','15°','16°','17°','18°','19°','20°'];
-  orderSel.innerHTML = '<option value="">— Posizione —</option>';
+  orderSel.innerHTML = '';
+  const defaultVal = currentOrder || freeSlots[0];
   freeSlots.forEach(i=>{
     const opt = document.createElement('option');
     opt.value = i;
     opt.textContent = ordinals[i-1]||`${i}°`;
-    if(i===currentOrder) opt.selected=true;
+    if(i===defaultVal) opt.selected=true;
     orderSel.appendChild(opt);
   });
 }
@@ -2914,11 +2961,15 @@ function addFilm(){
   const film = {id:crypto.randomUUID(), title, type, seriesId, seriesOrder, notes, addedAt:Date.now()};
   db.films.push(film);
   save();
+  localStorage.setItem('st_lastFilmType', type);
+  if(seriesId) localStorage.setItem('st_lastFilmSeriesId', seriesId);
+  // Reset solo titolo e note — tipo e saga restano invariati
   document.getElementById('filmTitle').value='';
   document.getElementById('filmNotes').value='';
+  // renderFilms si occuperà di aggiornare l'ordine preservando la saga già selezionata
   renderFilms(); updateFilmStats();
+  setTimeout(()=>{ const t=document.getElementById('filmTitle'); if(t) t.focus(); },30);
   toast('Film aggiunto ✓','success');
-  closeAddFilmModal();
 }
 
 function removeFilm(id){
@@ -3034,7 +3085,9 @@ function buildFilmItemHTML(film, idx){
 }
 
 function renderFilms(){
-  populateFilmSeriesSelect('filmSeriesSelect','filmOrderGroup','filmOrderSelect');
+  // Preserva solo la saga selezionata — l'ordine viene ricalcolato automaticamente al primo slot libero
+  const _curSeries = document.getElementById('filmSeriesSelect')?.value || null;
+  populateFilmSeriesSelect('filmSeriesSelect','filmOrderGroup','filmOrderSelect', null, _curSeries, null);
   updateFilmStats();
   const q = (document.getElementById('filmSearch')?.value||'').toLowerCase();
   const sort = document.getElementById('filmSort')?.value||'title';
