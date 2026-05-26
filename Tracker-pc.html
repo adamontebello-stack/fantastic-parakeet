@@ -1434,6 +1434,85 @@ main {
 }
 .sd-footer .btn { padding: 9px 12px; font-size: 0.76rem; }
 
+/* ===== NOTES TOOLTIP IN ROADMAP ===== */
+.rm-notes-wrap {
+  display: inline-flex;
+  align-items: center;
+}
+.rm-notes-badge {
+  font-size: 0.6rem;
+  font-family: 'DM Mono', monospace;
+  font-weight: 700;
+  color: var(--muted2);
+  background: var(--surface3);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 1px 6px;
+  cursor: default;
+  letter-spacing: 0.04em;
+  transition: border-color 0.18s, color 0.18s;
+  user-select: none;
+}
+.rm-notes-badge.hovered {
+  border-color: var(--accent);
+  color: var(--accent2);
+}
+#rm-tooltip-global {
+  display: none;
+  position: fixed;
+  min-width: 200px; max-width: 420px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 13px;
+  padding: 10px 13px;
+  font-size: 0.76rem;
+  font-family: 'DM Mono', monospace;
+  color: var(--muted2);
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.45), 0 0 0 1px var(--border);
+  z-index: 9999;
+  pointer-events: none;
+}
+#rm-tooltip-global.visible {
+  display: block;
+  animation: tooltipIn 0.15s cubic-bezier(0.2,0.8,0.3,1);
+}
+#rm-tooltip-global::before {
+  content: '';
+  position: absolute;
+  left: var(--arrow-left, 12px);
+  width: 9px; height: 9px;
+  background: var(--surface);
+  border-left: 1px solid var(--border2);
+  border-top: 1px solid var(--border2);
+  transform: rotate(45deg);
+  /* default: arrow on top (tooltip below badge) */
+  top: -5px;
+  border-right: none; border-bottom: none;
+}
+#rm-tooltip-global.above::before {
+  /* arrow on bottom (tooltip above badge) */
+  top: auto;
+  bottom: -5px;
+  transform: rotate(225deg);
+}
+@keyframes tooltipIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* film notes inside sd-film-item */
+.sd-film-notes {
+  font-size: 0.6rem;
+  font-family: 'DM Mono', monospace;
+  color: var(--muted);
+  margin-top: 2px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 </style>
 </head>
 <body class="theme-dark">
@@ -1623,6 +1702,9 @@ main {
 
 </div>
 </main>
+
+<!-- ===== GLOBAL NOTES TOOLTIP ===== -->
+<div id="rm-tooltip-global"></div>
 
 <!-- ===== SERIES DETAIL POPUP ===== -->
 <div class="series-detail-overlay" id="seriesDetailOverlay" onclick="handleSdOverlayClick(event)">
@@ -2042,11 +2124,12 @@ function openSeriesDetail(id){
     html += '</div>';
   }
 
-  // Linked films (saga match by title)
+  // Linked films — direct id match (anime saga) + fuzzy title match (film saga)
   const allFilms = [...(db.films||[]), ...(db.filmsCompleted||[])];
   const completedFilmIds = new Set((db.filmsCompleted||[]).map(f=>f.id));
   const linked = allFilms.filter(f=>{
     if(!f.seriesId) return false;
+    if(f.seriesId === s.id) return true;
     const fs = (db.filmSeries||[]).find(x=>x.id===f.seriesId);
     if(!fs) return false;
     const st=s.title.toLowerCase(), ft=fs.title.toLowerCase();
@@ -2059,8 +2142,9 @@ function openSeriesDetail(id){
     html += '<div class="sd-films-list">';
     linked.forEach(f=>{
       const ord = f.seriesOrder ? `<span class="sd-film-order">${getOrdinal(f.seriesOrder)}</span>` : '';
-      const done = completedFilmIds.has(f.id) ? `<span style="color:var(--green);font-size:0.75rem;margin-left:auto;">✓</span>` : '';
-      html += `<div class="sd-film-item">${ord}<span class="sd-film-title">${f.title}</span><span class="badge ${f.type.toLowerCase()}" style="font-size:0.55rem;padding:2px 6px;">${f.type}</span>${done}</div>`;
+      const done = completedFilmIds.has(f.id) ? `<span style="color:var(--green);font-size:0.75rem;margin-left:auto;flex-shrink:0;">✓</span>` : '';
+      const notesHtml = f.notes ? `<div class="sd-film-notes">📋 ${f.notes.replace(/</g,'&lt;')}</div>` : '';
+      html += `<div class="sd-film-item" style="flex-wrap:wrap;">${ord}<div style="flex:1;min-width:0;"><div class="sd-film-title">${f.title}</div>${notesHtml}</div><span class="badge ${f.type.toLowerCase()}" style="font-size:0.55rem;padding:2px 6px;flex-shrink:0;">${f.type}</span>${done}</div>`;
     });
     html += '</div></div>';
   }
@@ -2287,12 +2371,18 @@ function addRandom(forceType){
 
 function buildRmItemHTML(r, i){
   const pct=Math.round((r.currentEp||0)/r.eps*100);
+  // Fetch notes from db.series for this roadmap entry
+  const _srcSeries = db.series.find(x=>x.id===r.id);
+  const _notes = _srcSeries?.notes || r.notes || '';
+  const notesTooltip = _notes ? `<div class="rm-notes-wrap"><span class="rm-notes-badge" data-tooltip="${_notes.replace(/"/g,'&quot;').replace(/</g,'&lt;')}" onmouseenter="showRmTooltip(this)" onmouseleave="hideRmTooltip()">📋 note</span></div>` : '';
+  const _filmsCount = _srcSeries?.films || 0;
+  const filmsTag = _filmsCount > 0 ? ` · <span class="film-tag">🎬 ${_filmsCount} film</span>` : '';
   return `<div class="rm-item ${r.status==='watching'?'watching':''}" data-id="${r.id}" style="animation:itemIn .22s ${i*0.04}s both">
     <div class="drag-handle">⠿</div>
     <div class="rm-num">${String(i+1).padStart(2,'0')}</div>
     <div class="rm-info">
       <div class="rm-name">${r.title}</div>
-      <div class="rm-meta">${r.eps} ep</div>
+      <div class="rm-meta">${r.eps} ep${filmsTag}${_notes ? ' · ' : ''}${notesTooltip}</div>
       ${r.status==='watching'?`<div class="progress-row"><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div><div class="ep-stepper"><button class="step-btn" onclick="stepEp('${r.id}',-1)">‹</button><input class="ep-input" type="number" min="0" max="${r.eps}" value="${r.currentEp||0}" onchange="updateEp('${r.id}',this.value)"><button class="step-btn" onclick="stepEp('${r.id}',1)">›</button></div><span class="progress-num">/ ${r.eps}</span></div>`:''}
     </div>
     ${r.status==='watching'?`<div class="watching-tag">watching</div>`:''}
@@ -3049,6 +3139,58 @@ function renderFilmsCompleted(){
   }).join('');
 }
 
+
+// ---- NOTES TOOLTIP ----
+const _rmTooltipEl = document.getElementById('rm-tooltip-global');
+function showRmTooltip(badge){
+  const text = badge.dataset.tooltip;
+  if(!text) return;
+  badge.classList.add('hovered');
+  _rmTooltipEl.textContent = text;
+  // Measure tooltip width after setting content, before positioning
+  _rmTooltipEl.style.display = 'block';
+  _rmTooltipEl.style.visibility = 'hidden';
+  _rmTooltipEl.style.top = '0px';
+  _rmTooltipEl.style.left = '0px';
+  const tw = Math.min(_rmTooltipEl.offsetWidth, 340);
+  const th = _rmTooltipEl.offsetHeight;
+  _rmTooltipEl.style.visibility = '';
+  _rmTooltipEl.classList.add('visible');
+
+  const r = badge.getBoundingClientRect();
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const margin = 8;
+
+  // Horizontal: open to the right of the badge, clamp to viewport
+  let left = r.left;
+  if(left + tw > vw - margin) left = vw - tw - margin;
+  if(left < margin) left = margin;
+
+  // Vertical: below by default, flip above if not enough room
+  let top, openAbove;
+  if(r.bottom + 7 + th > vh - margin){
+    top = r.top - 7 - th;
+    openAbove = true;
+  } else {
+    top = r.bottom + 7;
+    openAbove = false;
+  }
+
+  _rmTooltipEl.style.top = top + 'px';
+  _rmTooltipEl.style.left = left + 'px';
+  _rmTooltipEl.classList.toggle('above', openAbove);
+
+  // Arrow horizontal offset relative to tooltip box
+  const arrowLeft = Math.min(Math.max(r.left - left + 6, 8), tw - 20);
+  _rmTooltipEl.style.setProperty('--arrow-left', arrowLeft + 'px');
+}
+function hideRmTooltip(){
+  _rmTooltipEl.classList.remove('visible','above');
+  _rmTooltipEl.style.display = '';
+  _rmTooltipEl.style.visibility = '';
+  document.querySelectorAll('.rm-notes-badge.hovered').forEach(b=>b.classList.remove('hovered'));
+}
 
 // ---- INIT ----
 loadTheme();
