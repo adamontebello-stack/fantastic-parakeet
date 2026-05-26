@@ -1841,11 +1841,7 @@ input[type="number"] { -moz-appearance: textfield; }
 
 <script>
 const PATTERN = ["DUB","DUB","SUB"];
-const GITHUB_TOKEN = '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';
-const GITHUB_OWNER = 'adamontebello-stack';
-const GITHUB_REPO = 'liste';
-const GITHUB_FILE = 'BackupTrackerSerie.json';
-const GITHUB_API_URL = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
+const FIREBASE_URL = 'https://serietracker-58894-default-rtdb.europe-west1.firebasedatabase.app/data.json';
 
 const SEED_DATA = {"series":[{"id":"b7fd69c0-526c-4d09-9bb5-273a3bc6a8fc","title":"Devilman crybaby","eps":10,"type":"DUB","genre":"","inRoadmap":false,"addedAt":1778456222046,"films":0,"notes":"","ongoing":false},{"id":"f3ac2288-5018-4725-a467-a40fad92a82b","title":"Paranoia agent","eps":12,"type":"DUB","genre":"","inRoadmap":false,"addedAt":1778456222046,"films":0,"notes":"","ongoing":false},{"id":"85479f45-636a-4711-a5a6-7767311b7e6e","title":"Boogiepop phantom","eps":12,"type":"DUB","genre":"","inRoadmap":false,"addedAt":1778456222046,"films":0,"notes":"","ongoing":false},{"id":"938c27b4-4af5-4c64-a8fa-5049b417f4d4","title":"Deadman wonderland","eps":12,"type":"DUB","genre":"","inRoadmap":false,"addedAt":1778456222046,"films":0,"notes":"","ongoing":false},{"id":"7165eb91-5e1b-4da0-989a-d6fdf2ba8881","title":"Da campagnolo stagionato a gran maestro di spada","eps":12,"type":"DUB","genre":"","inRoadmap":false,"addedAt":1778456222046,"films":0,"notes":"","ongoing":false},{"id":"2efa2a7d-a784-4517-9126-fb3b631ceb1b","title":"Highschool of the dead","eps":12,"type":"DUB","genre":"","inRoadmap":false,"addedAt":1778456222046,"films":0,"notes":"","ongoing":false},{"id":"e9af4dc6-f8b0-43c5-be0f-8a32536bd0b0","title":"Alice in borderland","eps":3,"type":"SUB","genre":"","inRoadmap":false,"addedAt":1778456222047,"films":0,"notes":"","ongoing":false},{"id":"fefb52f5-a16c-4e27-a672-49277da2d0a7","title":"Housing complex C","eps":4,"type":"SUB","genre":"","inRoadmap":false,"addedAt":1778456222047,"films":0,"notes":"","ongoing":false},{"id":"741352ec-9375-443d-b400-a8b540d75004","title":"Guilty gear","eps":8,"type":"SUB","genre":"","inRoadmap":false,"addedAt":1778456222047,"films":0,"notes":"","ongoing":false},{"id":"46c7cd9c-1b9e-4bb6-b059-31e8cf276d0a","title":"Blood lad","eps":10,"type":"SUB","genre":"","inRoadmap":false,"addedAt":1778456222047,"films":0,"notes":"","ongoing":false}],"roadmap":[],"dropped":[],"completed":[],"patternIndex":0,"_updatedAt":0};
 
@@ -1880,19 +1876,13 @@ function loadLocal(){
   }catch(e){ db={...db,...SEED_DATA}; if(!db.filmSeries) db.filmSeries=[]; saveLocal(); }
 }
 function saveLocal(){ localStorage.setItem('st_db',JSON.stringify(db)); }
-let _githubFileSha = null;
 async function _push(){
   setSyncState('syncing');
   try{
-    const infoRes=await fetch(GITHUB_API_URL,{headers:{'Authorization':'Bearer '+GITHUB_TOKEN,'Accept':'application/vnd.github+json'}});
-    if(!infoRes.ok) throw new Error('HTTP '+infoRes.status);
-    const info=await infoRes.json();
-    _githubFileSha=info.sha;
-    const content=btoa(unescape(encodeURIComponent(JSON.stringify(db))));
-    const res=await fetch(GITHUB_API_URL,{
+    const res=await fetch(FIREBASE_URL,{
       method:'PUT',
-      headers:{'Authorization':'Bearer '+GITHUB_TOKEN,'Accept':'application/vnd.github+json','Content-Type':'application/json'},
-      body:JSON.stringify({message:'SerieTracker sync '+new Date().toISOString(),content,sha:_githubFileSha})
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(db)
     });
     if(!res.ok) throw new Error('HTTP '+res.status);
     lastPushedAt=Date.now(); setSyncState('ok'); return true;
@@ -1901,8 +1891,7 @@ async function _push(){
 async function _pull(){
   setSyncState('syncing');
   try{
-    const rawUrl=`https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/${GITHUB_FILE}?cb=${Date.now()}`;
-    const res=await fetch(rawUrl);
+    const res=await fetch(FIREBASE_URL+'?cb='+Date.now());
     if(!res.ok) throw new Error('HTTP '+res.status);
     const remote=await res.json();
     if(remote&&(remote._updatedAt||0)>(db._updatedAt||0)){
