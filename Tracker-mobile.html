@@ -574,17 +574,19 @@ input[type="number"] { -moz-appearance: textfield; }
 
 }
 
-/* Migliora il tap su mobile */
+/* Su mobile rimuove hover stuck */
 
 @media (hover: none) {
 
   .item-btn.fav-btn:hover {
 
+    color: inherit !important;
+
+    opacity: 0.45 !important;
+
     transform: none !important;
 
-    text-shadow:
-
-      0 0 8px rgba(255,215,0,0.7) !important;
+    text-shadow: none !important;
 
   }
 
