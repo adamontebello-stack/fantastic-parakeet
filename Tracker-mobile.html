@@ -362,6 +362,7 @@ input[type="number"] { -moz-appearance: textfield; }
   overflow-x: auto; padding-bottom: 4px;
   margin-bottom: 12px;
   scrollbar-width: none;
+  justify-content: center;
 }
 .stats-bar::-webkit-scrollbar { display: none; }
 .stat-pill {
@@ -1345,6 +1346,72 @@ input[type="number"] { -moz-appearance: textfield; }
 .settings-dropdown-btn .sdb-icon { font-size: 1rem; flex-shrink: 0; }
 .settings-dropdown-divider { height: 1px; background: var(--border); margin: 4px 6px; }
 
+.fav-filter-btn {
+  background: var(--surface3); border: 1px solid var(--border);
+  color: var(--muted2); padding: 7px 11px; border-radius: 22px;
+  font-size: 0.72rem; cursor: pointer; font-weight: 700;
+  -webkit-appearance: none; transition: all 0.18s;
+  white-space: nowrap;
+}
+.fav-filter-btn.active {
+  background: rgba(255,215,0,0.15);
+  border-color: rgba(255,215,0,0.5);
+  color: #ffd700;
+  box-shadow: 0 0 8px rgba(255,215,0,0.2);
+}
+.fav-filter-btn:active { transform: scale(0.95); }
+
+/* ===== CATALOG TAB SWITCHER ===== */
+.catalog-tab-switcher {
+  display: flex; gap: 8px;
+  margin-bottom: 10px;
+}
+.catalog-tab-btn {
+  flex: 1;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  transition: all 0.2s cubic-bezier(0.34,1.2,0.64,1);
+  -webkit-appearance: none;
+  position: relative;
+  overflow: hidden;
+}
+.catalog-tab-btn::before {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+  border-radius: 0 0 14px 14px;
+  opacity: 0; transition: opacity 0.2s;
+}
+.catalog-tab-dub::before { background: var(--dub-border); }
+.catalog-tab-sub::before { background: var(--sub-border); }
+.catalog-tab-btn.active::before { opacity: 1; }
+.catalog-tab-dub.active {
+  border-color: var(--dub-border);
+  background: var(--dub-bg);
+  box-shadow: 0 0 14px rgba(255,94,122,0.15);
+}
+.catalog-tab-sub.active {
+  border-color: var(--sub-border);
+  background: var(--sub-bg);
+  box-shadow: 0 0 14px rgba(74,199,255,0.15);
+}
+.catalog-tab-btn:active { transform: scale(0.97); }
+.catalog-tab-label {
+  font-size: 0.78rem; font-weight: 700;
+  color: var(--muted2);
+  transition: color 0.2s;
+}
+.catalog-tab-dub.active .catalog-tab-label { color: var(--dub-color); }
+.catalog-tab-sub.active .catalog-tab-label { color: var(--sub-color); }
+
+.catalog-tab-btn .count-badge {
+  color: var(--text);
+}
+
 /* ===== FILM SAGA MANAGER POPUP ===== */
 .saga-manager-list { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; max-height: 260px; overflow-y: auto; }
 .saga-manager-item {
@@ -1504,21 +1571,27 @@ input[type="number"] { -moz-appearance: textfield; }
     <input class="ep-filter-input" type="number" id="epFilterInput" placeholder="es.12" min="1" oninput="renderCatalog()">
     <button class="ep-filter-clear" onclick="clearEpFilter()">✕ Reset</button>
     <span class="ep-filter-badge" id="epFilterBadge"></span>
+    <button class="fav-filter-btn" id="favFilterBtn" onclick="toggleFavFilter()">★ Preferiti</button>
   </div>
   <div class="stats-bar" id="catalogStats"></div>
 
-  <div class="catalog-col col-dub">
-    <div class="column-header">
-      <div class="column-title"><span class="badge dub">DUB</span><h3>Doppiato</h3></div>
+  <div class="catalog-tab-switcher">
+    <button class="catalog-tab-btn catalog-tab-dub active" id="tab-dub" onclick="switchCatalogTab('dub')">
+      <span class="badge dub">DUB</span>
+      <span class="catalog-tab-label">Doppiato</span>
       <span class="count-badge" id="dub-count">0</span>
-    </div>
+    </button>
+    <button class="catalog-tab-btn catalog-tab-sub" id="tab-sub" onclick="switchCatalogTab('sub')">
+      <span class="badge sub">SUB</span>
+      <span class="catalog-tab-label">Sottotitolato</span>
+      <span class="count-badge" id="sub-count">0</span>
+    </button>
+  </div>
+
+  <div class="catalog-col col-dub" id="catalog-panel-dub">
     <div class="list" id="dub-list"></div>
   </div>
-  <div class="catalog-col col-sub">
-    <div class="column-header">
-      <div class="column-title"><span class="badge sub">SUB</span><h3>Sottotitolato</h3></div>
-      <span class="count-badge" id="sub-count">0</span>
-    </div>
+  <div class="catalog-col col-sub" id="catalog-panel-sub" style="display:none">
     <div class="list" id="sub-list"></div>
   </div>
 </div>
@@ -2016,12 +2089,19 @@ function renderList(id,data){
 function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 // ---- RENDER CATALOG ----
+let _favFilterActive = false;
+function toggleFavFilter(){
+  _favFilterActive = !_favFilterActive;
+  document.getElementById('favFilterBtn').classList.toggle('active', _favFilterActive);
+  renderCatalog();
+}
+
 function renderCatalog(){
   const q=(document.getElementById('catalogSearch')?.value||'').toLowerCase();
   const epF=parseInt(document.getElementById('epFilterInput')?.value)||0;
   const badge=document.getElementById('epFilterBadge');
   if(epF>0&&badge){ badge.textContent=`${epF} ep`; badge.classList.add('active'); } else if(badge){ badge.classList.remove('active'); }
-  let filtered=db.series.filter(s=>!s.inRoadmap&&(!q||s.title.toLowerCase().includes(q))&&(!epF||s.eps===epF));
+  let filtered=db.series.filter(s=>!s.inRoadmap&&(!q||s.title.toLowerCase().includes(q))&&(!epF||s.eps===epF)&&(!_favFilterActive||s.favorite));
   const dubs=renderSortedSeries(filtered.filter(s=>s.type==='DUB'));
   const subs=renderSortedSeries(filtered.filter(s=>s.type==='SUB'));
   document.getElementById('dub-count').textContent=dubs.length;
@@ -2038,7 +2118,7 @@ function updateCatalogStats(){
   const totalEps=all.reduce((a,s)=>a+s.eps,0);
   const favCount=all.filter(s=>s.favorite).length;
   const favPill=favCount>0?`<div class="stat-pill"><span style="color:#ffd700;font-size:0.75rem">★</span> Preferiti: <strong>${favCount}</strong></div>`:'';
-  document.getElementById('catalogStats').innerHTML=`<div class="stat-pill"><span class="dot"></span> Totale: <strong>${all.length}</strong></div><div class="stat-pill"><span class="dot blue"></span> DUB: <strong>${all.filter(s=>s.type==='DUB').length}</strong></div><div class="stat-pill"><span class="dot red"></span> SUB: <strong>${all.filter(s=>s.type==='SUB').length}</strong></div><div class="stat-pill"><span class="dot amber"></span> Ep totali: <strong>${totalEps}</strong></div>${favPill}`;
+  document.getElementById('catalogStats').innerHTML=`<div class="stat-pill"><span class="dot"></span> Totale: <strong>${all.length}</strong></div><div class="stat-pill"><span class="dot amber"></span> Ep totali: <strong>${totalEps}</strong></div>${favPill}`;
 }
 
 // Global edit modal
@@ -2964,6 +3044,21 @@ function renderFilms(){
       </div>
     </div>`;
   }).join('');
+}
+
+// ---- CATALOG TAB SWITCH ----
+function switchCatalogTab(tab) {
+  const dubBtn = document.getElementById('tab-dub');
+  const subBtn = document.getElementById('tab-sub');
+  const dubPanel = document.getElementById('catalog-panel-dub');
+  const subPanel = document.getElementById('catalog-panel-sub');
+  if (tab === 'dub') {
+    dubBtn.classList.add('active'); subBtn.classList.remove('active');
+    dubPanel.style.display = ''; subPanel.style.display = 'none';
+  } else {
+    subBtn.classList.add('active'); dubBtn.classList.remove('active');
+    subPanel.style.display = ''; dubPanel.style.display = 'none';
+  }
 }
 
 // ---- KEYBOARD + CLICK OUTSIDE ----
