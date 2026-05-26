@@ -1571,7 +1571,7 @@ input[type="number"] { -moz-appearance: textfield; }
     <input class="ep-filter-input" type="number" id="epFilterInput" placeholder="es.12" min="1" oninput="renderCatalog()">
     <button class="ep-filter-clear" onclick="clearEpFilter()">✕ Reset</button>
     <span class="ep-filter-badge" id="epFilterBadge"></span>
-    <button class="fav-filter-btn" id="favFilterBtn" onclick="toggleFavFilter()">★ Preferiti</button>
+    <button class="fav-filter-btn" id="favFilterBtn" onclick="toggleFavFilter(event)">★ Preferiti</button>
   </div>
   <div class="stats-bar" id="catalogStats"></div>
 
@@ -2090,7 +2090,8 @@ function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
 
 // ---- RENDER CATALOG ----
 let _favFilterActive = false;
-function toggleFavFilter(){
+function toggleFavFilter(e){
+  if(e) e.stopPropagation();
   _favFilterActive = !_favFilterActive;
   document.getElementById('favFilterBtn').classList.toggle('active', _favFilterActive);
   renderCatalog();
