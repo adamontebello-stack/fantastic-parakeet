@@ -1901,11 +1901,10 @@ async function _push(){
 async function _pull(){
   setSyncState('syncing');
   try{
-    const res=await fetch(GITHUB_API_URL,{headers:{'Authorization':'Bearer '+GITHUB_TOKEN,'Accept':'application/vnd.github+json'}});
+    const rawUrl=`https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/${GITHUB_FILE}?cb=${Date.now()}`;
+    const res=await fetch(rawUrl);
     if(!res.ok) throw new Error('HTTP '+res.status);
-    const info=await res.json();
-    _githubFileSha=info.sha;
-    const remote=JSON.parse(decodeURIComponent(escape(atob(info.content.replace(/\n/g,'')))));
+    const remote=await res.json();
     if(remote&&(remote._updatedAt||0)>(db._updatedAt||0)){
       db=Object.assign({},db,remote);
       if(!db.filmSeries) db.filmSeries=[];
