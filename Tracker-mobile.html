@@ -90,6 +90,18 @@ body.theme-amber {
   --card-hover: rgba(255,159,0,0.08); --shadow-sm: 0 8px 28px rgba(0,0,0,0.6);
   --shadow-glow: 0 0 35px var(--accentGlow); --toast-bg: #181000;
 }
+body.theme-neutral {
+  --bg: #000000; --surface: #0a0a0a; --surface2: #111111; --surface3: #1a1a1a;
+  --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.13);
+  --accent: #ff3cac; --accent2: #ff3cac; --accentGlow: rgba(255,60,172,0.45); --accentGlow2: rgba(255,60,172,0.1);
+  --red: #ff4444; --blue: #38bdf8; --green: #22d97a; --amber: #fbbf24;
+  --text: #f0f0f0; --muted: #555555; --muted2: #888888;
+  --dub-color: #ff6b6b; --dub-bg: rgba(255,60,60,0.12); --dub-border: rgba(255,60,60,0.35);
+  --sub-color: #38bdf8; --sub-bg: rgba(56,189,248,0.12); --sub-border: rgba(56,189,248,0.35);
+  --card-hover: rgba(255,255,255,0.04); --shadow-sm: 0 4px 24px rgba(0,0,0,0.9);
+  --shadow-glow: 0 0 35px var(--accentGlow); --toast-bg: #0a0a0a;
+  color-scheme: dark;
+}
 
 html {
   scroll-behavior: smooth;
@@ -131,23 +143,7 @@ body::after {
 }
 
 /* ===== TOP HEADER (logo + actions) ===== */
-.top-bar {
-  position: sticky;
-  top: 0;
-  z-index: 200;
-  /* Safe area: push content down below Dynamic Island */
-  padding: 0 16px;
-  padding-top: env(safe-area-inset-top);
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  backdrop-filter: blur(28px) saturate(180%);
-  border-bottom: 1px solid var(--border);
-}
-
-.top-bar-inner {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 10px; min-height: 54px;
-}
+/* top-bar removed */
 
 .logo {
   display: flex; align-items: center; gap: 9px;
@@ -266,7 +262,7 @@ body::after {
 /* ===== MAIN CONTENT ===== */
 main {
   position: relative; z-index: 1;
-  padding: 14px 14px 0;
+  padding: 10px 14px 0;
   padding-bottom: calc(56px + var(--safe-bottom));
   max-width: 480px;
   margin: 0 auto;
@@ -896,8 +892,8 @@ input[type="number"] { -moz-appearance: textfield; }
   white-space: nowrap;
 }
 @keyframes watchPulse {
-  0%,100% { box-shadow: 0 0 0px var(--accentGlow); }
-  50%      { box-shadow: 0 0 7px var(--accentGlow); }
+  0%,100% { box-shadow: 0 0 0px rgba(255, 255, 255, 0.55); }
+  50%      { box-shadow: 0 0 7px rgba(255, 255, 255, 0.55); }
 }
 
 /* Check mark */
@@ -1140,6 +1136,8 @@ input[type="number"] { -moz-appearance: textfield; }
   color: var(--green); background: rgba(46,232,165,0.12);
   border: 1px solid rgba(46,232,165,0.3);
   animation: watchPulse 2s ease-in-out infinite;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.08em; text-transform: uppercase;
 }
 .item-tag.films {
   color: var(--blue); background: rgba(45,158,255,0.12);
@@ -1321,19 +1319,65 @@ input[type="number"] { -moz-appearance: textfield; }
 <style>
 /* ===== SETTINGS DROPDOWN ===== */
 .settings-wrap { position: relative; }
+.tab-btn-wrap { flex: 1; display: flex; flex-direction: column; align-items: stretch; }
+.tab-btn-wrap > .tab-btn { width: 100%; }
 .settings-dropdown {
-  position: absolute; top: calc(100% + 8px); right: 0;
+  position: absolute; bottom: calc(100% + 8px); right: 0;
   background: var(--surface2);
   border: 1px solid var(--border2);
   border-radius: 16px;
   padding: 6px;
-  min-width: 180px;
+  min-width: 200px;
   box-shadow: 0 12px 40px rgba(0,0,0,0.5);
   z-index: 9500;
   display: none;
   animation: popIn 0.18s cubic-bezier(0.34,1.3,0.64,1);
 }
 .settings-dropdown.open { display: block; }
+/* badge-style tab icons */
+.tab-icon-badge {
+  font-size: 0.52rem !important;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.08em;
+  background: var(--surface3);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 3px 6px;
+  line-height: 1;
+  display: inline-block;
+  transition: all 0.22s cubic-bezier(0.34,1.4,0.64,1);
+}
+.tab-btn.active .tab-icon-badge {
+  background: var(--accentGlow2);
+  border-color: var(--accent2);
+  color: var(--accent2);
+}
+/* theme dots inside dropdown */
+.sdb-theme-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px 8px;
+}
+.sdb-theme-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.56rem; font-weight: 800;
+  letter-spacing: 0.1em; color: var(--muted2);
+  flex-shrink: 0;
+}
+.sdb-theme-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.sdb-theme-dot {
+  width: 20px; height: 20px; border-radius: 6px;
+  border: 2px solid transparent;
+  cursor: pointer; transition: all 0.18s;
+  -webkit-appearance: none;
+}
+.sdb-theme-dot.active { border-color: var(--accent2); transform: scale(1.18); }
+.sdb-theme-dot.theme-dark-dot    { background: #1a1a2e; }
+.sdb-theme-dot.theme-light-dot   { background: #e8e8f0; border: 2px solid #ccc; }
+.sdb-theme-dot.theme-azure-dot   { background: #0a2040; }
+.sdb-theme-dot.theme-purple-dot  { background: #1a0a30; }
+.sdb-theme-dot.theme-amber-dot   { background: #231800; }
+.sdb-theme-dot.theme-neutral-dot { background: #000000; border: 2px solid #ff3cac; }
 .settings-dropdown-btn {
   display: flex; align-items: center; gap: 10px;
   width: 100%; padding: 11px 12px;
@@ -1417,11 +1461,25 @@ input[type="number"] { -moz-appearance: textfield; }
 /* ===== ROADMAP DETAIL DRAWER ===== */
 .rm-item.has-detail { cursor: pointer; }
 .rm-item.has-detail:active { background: var(--surface3); }
-.rm-info-icon { font-size: 0.75rem; line-height: 1; }
+.rm-info-icon {
+  display: inline-flex; align-items: center;
+  font-size: 0.54rem; font-weight: 700; letter-spacing: 0.08em;
+  padding: 2px 6px; border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  white-space: nowrap;
+}
+.rm-info-icon.notes {
+  color: var(--yellow,#f5c542); background: rgba(245,197,66,0.13);
+  border: 1px solid rgba(245,197,66,0.35);
+}
+.rm-info-icon.films {
+  color: var(--blue,#2d9eff); background: rgba(45,158,255,0.13);
+  border: 1px solid rgba(45,158,255,0.35);
+}
 
 #roadmapDetailOverlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.55);
-  z-index: 1100; opacity: 0; pointer-events: none;
+  z-index: 9600; opacity: 0; pointer-events: none;
   transition: opacity 0.25s;
   backdrop-filter: blur(3px);
 }
@@ -1432,7 +1490,7 @@ input[type="number"] { -moz-appearance: textfield; }
   background: var(--surface2);
   border-radius: 22px 22px 0 0;
   padding: 0 0 env(safe-area-inset-bottom,16px);
-  z-index: 1101;
+  z-index: 9601;
   transform: translateY(100%);
   transition: transform 0.32s cubic-bezier(0.34,1.1,0.64,1);
   max-height: 75vh; overflow-y: auto;
@@ -1461,15 +1519,25 @@ input[type="number"] { -moz-appearance: textfield; }
   border-radius: 10px; padding: 10px 12px;
   border: 1px solid var(--border);
 }
-.rd-films-count {
-  display: inline-flex; align-items: center; gap: 8px;
+.rd-film-item {
+  display: flex; align-items: center; gap: 8px;
   background: var(--surface3); border: 1px solid var(--border);
-  border-radius: 12px; padding: 10px 14px;
-  font-size: 0.85rem; font-weight: 700; color: var(--text);
+  border-radius: 10px; padding: 8px 12px;
+  margin-bottom: 5px;
 }
-.rd-films-count .film-num {
-  font-size: 1.2rem; font-weight: 900; color: var(--accent);
+.rd-film-item.done { opacity: 0.55; }
+.rd-film-order {
   font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem; font-weight: 800; color: var(--muted2);
+  min-width: 18px; text-align: right;
+}
+.rd-film-title {
+  flex: 1; font-size: 0.82rem; font-weight: 700;
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  color: var(--text);
+}
+.rd-film-done {
+  font-size: 0.7rem; color: var(--green); font-weight: 900;
 }
 
 /* ===== FILM SAGA MANAGER POPUP ===== */
@@ -1563,50 +1631,9 @@ input[type="number"] { -moz-appearance: textfield; }
 </head>
 <body class="theme-dark">
 
-<!-- TOP BAR -->
-<div class="top-bar">
-  <div class="top-bar-inner">
-    <div class="logo">
-      <div class="logo-icon">ST</div>
-      <div class="logo-text">Serie<span>Tracker</span></div>
-    </div>
-  <div class="hdr-actions">
-    <div class="theme-btn-wrap" title="Tema">
-      <div class="theme-btn-icon">🎨</div>
-      <select class="theme-selector" id="themeSelect" onchange="setThemeFromSelect(this.value)">
-        <option value="dark">Dark</option>
-        <option value="light">Light</option>
-        <option value="azure">Azure</option>
-        <option value="purple">Purple</option>
-        <option value="amber">Amber</option>
-      </select>
-    </div>
-    <!-- Settings gear -->
-    <div class="settings-wrap">
-      <button class="icon-btn" id="settingsBtn" onclick="toggleSettingsDropdown()" title="Impostazioni">
-        <span>⚙</span>
-      </button>
-      <div class="settings-dropdown" id="settingsDropdown">
-        <button class="settings-dropdown-btn" onclick="manualSync();closeSettingsDropdown()">
-          <span class="sdb-icon">⟳</span>
-          <span>Sync</span>
-          <span class="sync-dot" id="syncDot" style="position:static;margin-left:auto"></span>
-        </button>
-        <div class="settings-dropdown-divider"></div>
-        <button class="settings-dropdown-btn" onclick="exportJSON();closeSettingsDropdown()">
-          <span class="sdb-icon">↓</span>
-          <span>Esporta JSON</span>
-        </button>
-        <button class="settings-dropdown-btn" onclick="document.getElementById('importFile').click();closeSettingsDropdown()">
-          <span class="sdb-icon">↑</span>
-          <span>Importa JSON</span>
-        </button>
-        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
-      </div>
-    </div>
-  </div><!-- /.hdr-actions -->
-  </div><!-- /.top-bar-inner -->
-</div><!-- /.top-bar -->
+
+<input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
+
 
 <!-- MAIN -->
 <main>
@@ -1661,7 +1688,7 @@ input[type="number"] { -moz-appearance: textfield; }
   <div class="sec-header" style="margin-bottom:12px">
     <h2 class="sec-title">Film</h2>
     <div class="sec-btns">
-      <button class="btn btn-ghost btn-sm" onclick="openFilmSeriesManager()">🎬 Saghe</button>
+      <button class="btn btn-ghost btn-sm" onclick="openFilmSeriesManager()">Saghe</button>
       <button class="add-btn" onclick="openAddFilmPopup()">＋ Aggiungi</button>
     </div>
   </div>
@@ -1684,9 +1711,9 @@ input[type="number"] { -moz-appearance: textfield; }
   <div class="sec-header">
     <h2 class="sec-title">Roadmap</h2>
     <div class="sec-btns">
-      <button class="btn btn-ghost btn-sm" onclick="addRandom()">⚄ Random</button>
-      <button class="btn btn-sm" onclick="addRandom('DUB')">+D</button>
-      <button class="btn btn-sm" onclick="addRandom('SUB')">+S</button>
+      <button class="btn btn-ghost btn-sm" onclick="addRandom()">Random</button>
+      <button class="btn btn-sm" onclick="addRandom('DUB')">+DUB</button>
+      <button class="btn btn-sm" onclick="addRandom('SUB')">+SUB</button>
     </div>
   </div>
   <div class="stats-bar">
@@ -1736,21 +1763,55 @@ input[type="number"] { -moz-appearance: textfield; }
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <button class="tab-btn active" onclick="showSection(event,'catalogo')" data-section="catalogo">
-    <span class="tab-icon">📋</span>
+    <span class="tab-icon tab-icon-badge">CAT</span>
     <span>Catalogo</span>
   </button>
   <button class="tab-btn" onclick="showSection(event,'film-section')" data-section="film-section">
-    <span class="tab-icon">🎬</span>
+    <span class="tab-icon tab-icon-badge">FILM</span>
     <span>Film</span>
   </button>
   <button class="tab-btn" onclick="showSection(event,'programma')" data-section="programma">
-    <span class="tab-icon">🗺</span>
+    <span class="tab-icon tab-icon-badge">MAP</span>
     <span>Programma</span>
   </button>
   <button class="tab-btn" onclick="showSection(event,'completate')" data-section="completate">
-    <span class="tab-icon">✅</span>
+    <span class="tab-icon tab-icon-badge">DONE</span>
     <span>Completate</span>
   </button>
+  <div class="settings-wrap tab-btn-wrap">
+    <button class="tab-btn" id="settingsBtn" onclick="toggleSettingsDropdown()" title="Impostazioni">
+      <span class="tab-icon tab-icon-badge">SET</span>
+      <span>Impostazioni</span>
+    </button>
+    <div class="settings-dropdown" id="settingsDropdown">
+      <div class="sdb-theme-row">
+        <span class="sdb-theme-label">STILE</span>
+        <div class="sdb-theme-btns" id="sdbThemeBtns">
+          <button class="sdb-theme-dot theme-dark-dot" onclick="setTheme('dark')" data-theme="dark" title="Dark"></button>
+          <button class="sdb-theme-dot theme-light-dot" onclick="setTheme('light')" data-theme="light" title="Light"></button>
+          <button class="sdb-theme-dot theme-azure-dot" onclick="setTheme('azure')" data-theme="azure" title="Azure"></button>
+          <button class="sdb-theme-dot theme-purple-dot" onclick="setTheme('purple')" data-theme="purple" title="Purple"></button>
+          <button class="sdb-theme-dot theme-amber-dot" onclick="setTheme('amber')" data-theme="amber" title="Amber"></button>
+          <button class="sdb-theme-dot theme-neutral-dot" onclick="setTheme('neutral')" data-theme="neutral" title="Neutral"></button>
+        </div>
+      </div>
+      <div class="settings-dropdown-divider"></div>
+      <button class="settings-dropdown-btn" onclick="manualSync()">
+        <span class="sdb-icon">⟳</span>
+        <span>Sync</span>
+        <span class="sync-dot" id="syncDot" style="position:static;margin-left:auto"></span>
+      </button>
+      <div class="settings-dropdown-divider"></div>
+      <button class="settings-dropdown-btn" onclick="exportJSON()">
+        <span class="sdb-icon">↓</span>
+        <span>Esporta JSON</span>
+      </button>
+      <button class="settings-dropdown-btn" onclick="document.getElementById('importFile').click()">
+        <span class="sdb-icon">↑</span>
+        <span>Importa JSON</span>
+      </button>
+    </div>
+  </div>
 </nav>
 
 <!-- EDIT MODAL (serie anime) -->
@@ -1780,7 +1841,7 @@ input[type="number"] { -moz-appearance: textfield; }
     </div>
     <div class="edit-modal-field">
       <div class="toggle-row">
-        <span class="toggle-label-text">📡 In corso (ongoing)</span>
+        <span class="toggle-label-text">In corso (ongoing)</span>
         <div class="toggle-switch" id="em-ongoing"></div>
       </div>
     </div>
@@ -1876,7 +1937,7 @@ input[type="number"] { -moz-appearance: textfield; }
 <div class="popup-overlay" id="filmSeriesManagerPopup">
   <div class="popup-box" onclick="event.stopPropagation()">
     <div class="popup-header">
-      <span class="popup-title">🎬 Gestisci Saghe</span>
+      <span class="popup-title">Gestisci Saghe</span>
       <button class="popup-close" onclick="closeFilmSeriesManager()">✕</button>
     </div>
     <div class="popup-field">
@@ -1903,7 +1964,7 @@ input[type="number"] { -moz-appearance: textfield; }
 <div class="popup-overlay" id="addFilmPopup">
   <div class="popup-box" onclick="event.stopPropagation()">
     <div class="popup-header">
-      <span class="popup-title">🎬 Nuovo film</span>
+      <span class="popup-title">Nuovo film</span>
       <button class="popup-close" onclick="closeAddFilmPopup()">✕</button>
     </div>
     <div class="popup-field">
@@ -1994,18 +2055,20 @@ let lastPushedAt=0, syncTimer=null, syncQueue=Promise.resolve();
 // ---- TEMA ----
 function setTheme(theme){
   const body=document.body;
-  body.classList.remove('theme-dark','theme-light','theme-azure','theme-purple','theme-amber');
+  body.classList.remove('theme-dark','theme-light','theme-azure','theme-purple','theme-amber','theme-neutral');
   body.classList.add(`theme-${theme}`);
   localStorage.setItem('st_theme',theme);
-  const sel=document.getElementById('themeSelect');
-  if(sel) sel.value=theme;
+  document.querySelectorAll('.sdb-theme-dot').forEach(d=>{
+    d.classList.toggle('active', d.dataset.theme===theme);
+  });
 }
 function setThemeFromSelect(t){ setTheme(t); }
 function loadTheme(){
   const s=localStorage.getItem('st_theme');
-  if(s&&['dark','light','azure','purple','amber'].includes(s)) setTheme(s);
+  if(s&&['dark','light','azure','purple','amber','neutral'].includes(s)) setTheme(s);
   else setTheme('dark');
 }
+function setThemeFromSelect(t){ setTheme(t); }
 
 // ---- LOCAL STORAGE & SYNC ----
 function loadLocal(){
@@ -2138,8 +2201,8 @@ function renderList(id,data){
   if(!data.length){ el.innerHTML='<div class="empty"><div class="empty-icon">◌</div>Nessuna serie</div>'; return; }
   el.innerHTML=data.map((s,i)=>{
     let tagsHtml='';
-    if(s.ongoing) tagsHtml+='<span class="item-tag ongoing">▶ In corso</span>';
-    if(s.films>0) tagsHtml+='<span class="item-tag films">🎬 '+s.films+' film</span>';
+    if(s.ongoing) tagsHtml+='<span class="item-tag ongoing">▶ IN CORSO</span>';
+    if(s.films>0) tagsHtml+='<span class="item-tag films">'+s.films+' FILM</span>';
     const tagsRow=tagsHtml?'<div class="item-tags">'+tagsHtml+'</div>':'';
     const notesRow=s.notes?'<div class="item-notes-row">📝 '+escHtml(s.notes)+'</div>':'';
     return '<div class="item" style="animation:itemIn .2s '+(i*0.025)+'s both" id="item-'+s.id+'">'
@@ -2172,10 +2235,23 @@ function openRoadmapDetail(id){
   // Body
   let body='';
   if(series&&series.notes&&series.notes.trim()){
-    body+=`<div><div class="rd-section-label">📝 Note</div><div class="rd-notes-text">${escHtml(series.notes.trim())}</div></div>`;
+    body+=`<div><div class="rd-section-label">NOTE</div><div class="rd-notes-text">${escHtml(series.notes.trim())}</div></div>`;
   }
   if(series&&series.films>0){
-    body+=`<div><div class="rd-section-label">🎬 Film collegati</div><div class="rd-films-count"><span class="film-num">${series.films}</span> film ${series.films===1?'collegato':'collegati'} a questa serie</div></div>`;
+    const linkedFilms=[...(db.films||[]),...(db.filmsCompleted||[])].filter(f=>f.seriesId===series.id).sort((a,b)=>(a.seriesOrder||0)-(b.seriesOrder||0));
+    const filmListHtml=linkedFilms.length>0
+      ? linkedFilms.map(f=>{
+          const isDone=!!(db.filmsCompleted||[]).find(x=>x.id===f.id);
+          const typeCls=f.type==='DUB'?'dub':'sub';
+          return `<div class="rd-film-item ${isDone?'done':''}">
+            <span class="rd-film-order">${f.seriesOrder!=null?f.seriesOrder+'°':'—'}</span>
+            <span class="rd-film-title">${escHtml(f.title)}</span>
+            <span class="badge ${typeCls}" style="padding:1px 6px;font-size:0.52rem;flex-shrink:0">${f.type}</span>
+            ${isDone?'<span class="rd-film-done">✓</span>':''}
+          </div>`;
+        }).join('')
+      : `<div style="color:var(--muted2);font-size:0.8rem">${series.films} film collegati</div>`;
+    body+=`<div><div class="rd-section-label" style="margin-bottom:6px">FILM COLLEGATI</div>${filmListHtml}</div>`;
   }
   document.getElementById('rdBody').innerHTML=body;
   document.getElementById('roadmapDetailOverlay').classList.add('open');
@@ -2253,8 +2329,8 @@ function saveEditModal(){
   const itemEl=document.getElementById('item-'+_editModalId);
   if(itemEl){
     const tags=[];
-    if(s.ongoing) tags.push(`<span class="item-tag ongoing">▶ In corso</span>`);
-    if(s.films>0) tags.push(`<span class="item-tag films">🎬 ${s.films} film</span>`);
+    if(s.ongoing) tags.push(`<span class="item-tag ongoing">▶ IN CORSO</span>`);
+    if(s.films>0) tags.push(`<span class="item-tag films">${s.films} FILM</span>`);
     const body=itemEl.querySelector('.item-body');
     if(body){
       body.querySelector('.item-title').textContent=s.title;
@@ -2465,7 +2541,7 @@ function renderRoadmap(){
   if(!db.roadmap.length){ el.innerHTML='<div class="empty"><div class="empty-icon">▷</div>Roadmap vuota</div>'; return; }
   el.innerHTML=db.roadmap.map((r,i)=>{
     const isW=r.status==='watching';
-    const watchTag=isW?'<div class="watching-tag" style="flex-shrink:0">● watching</div>':'';
+    const watchTag=isW?'<div class="watching-tag" style="flex-shrink:0">●WATCHING</div>':'';
     const pct=Math.round((r.currentEp||0)/r.eps*100);
     const progressRow=isW
       ?'<div class="progress-row">'
@@ -2481,8 +2557,9 @@ function renderRoadmap(){
     const series=db.series.find(s=>s.id===r.id);
     const hasNotes=series&&series.notes&&series.notes.trim().length>0;
     const hasFilms=series&&series.films>0;
-    const infoIcons=(hasNotes?'<span class="rm-info-icon">\ud83d\udcdd</span>':'')
-                   +(hasFilms?'<span class="rm-info-icon">\ud83c\udfa6</span>':'');
+    const filmCount=hasFilms?series.films:0;
+    const infoIcons=(hasNotes?'<span class="rm-info-icon notes">NOTE</span>':'')
+                   +(hasFilms?'<span class="rm-info-icon films">'+filmCount+' FILM</span>':'');
     const canTap=hasNotes||hasFilms;
     return '<div class="rm-item '+(isW?'watching':'')+(canTap?' has-detail':'')+'" data-id="'+r.id+'" style="animation:itemIn .22s '+(i*0.04)+'s both"'+(canTap?' onclick="event.stopPropagation();openRoadmapDetail(\''+r.id+'\')"':'')+' >'
       +'<div class="drag-handle">⠿</div>'
@@ -2764,12 +2841,12 @@ function populateFilmSagaSelect(selectId, currentSeriesId='', excludeFilmId=null
 
   let html='<option value="">— Stand-alone —</option>';
   if(animeAvail.length){
-    html+=`<optgroup label="📺 Saga Anime">`;
+    html+=`<optgroup label="Saga Anime">`;
     animeAvail.forEach(s=>{ html+=`<option value="${s.id}"${s.id===currentSeriesId?' selected':''}>${escHtml(s.title)}</option>`; });
     html+='</optgroup>';
   }
   if(filmAvail.length){
-    html+=`<optgroup label="🎬 Saga Film">`;
+    html+=`<optgroup label="Saga Film">`;
     filmAvail.forEach(s=>{ html+=`<option value="${s.id}"${s.id===currentSeriesId?' selected':''}>${escHtml(s.title)}</option>`; });
     html+='</optgroup>';
   }
@@ -3067,16 +3144,16 @@ function renderFilms(){
     <div class="stat-pill"><span class="dot green"></span> Completati: <strong>${db.filmsCompleted.length}</strong></div>`;
 
   const el=document.getElementById('film-list');
-  if(!data.length){ el.innerHTML='<div class="empty"><div class="empty-icon">🎬</div>Nessun film in catalogo</div>'; }
+  if(!data.length){ el.innerHTML='<div class="empty">Nessun film in catalogo</div>'; }
   else {
     const buildFilmItem=(f,i,showBadge=false,insideSaga=false)=>{
       const rec=f.seriesId?getSeriesRecord(f.seriesId):null;
       const typeColor=f.type==='DUB'?'var(--dub-color)':'var(--sub-color)';
       const tagHtml=(rec&&!insideSaga)
-        ?`<span class="film-tag da-serie">${rec._source==='anime'?'📺 anime':'🎬 saga'}</span>`
+        ?`<span class="film-tag da-serie">${rec._source==='anime'?'anime':'saga'}</span>`
         :(!rec?`<span class="film-tag standalone">stand-alone</span>`:'');
       const orderBadge=(showBadge&&f.seriesOrder!=null)?`<span class="film-order-badge">${f.seriesOrder}°</span>`:'';
-      const serieNameHtml=(rec&&!insideSaga)?`<div class="film-serie-name">${rec._source==='anime'?'📺':'🎬'} ${escHtml(rec.title)}</div>`:'';
+      const serieNameHtml=(rec&&!insideSaga)?`<div class="film-serie-name">${escHtml(rec.title)}</div>`:'';
       const notesHtml=f.notes?`<div class="item-notes-row">📝 ${escHtml(f.notes)}</div>`:'';
       return `<div class="rm-item" data-id="${f.id}" style="animation:itemIn .2s ${i*0.025}s both">
         <div class="rm-num">${String(i+1).padStart(2,'0')}</div>
@@ -3106,7 +3183,7 @@ function renderFilms(){
       const typeLabel=isAnime?'anime':'film';
       html+=`<div class="film-saga-block">
         <div class="film-saga-header">
-          ${isAnime?'📺':'🎬'} ${escHtml(sagaTitle)}
+          ${escHtml(sagaTitle)}
           <span class="saga-type-badge ${typeLabel}">${typeLabel}</span>
         </div>`;
       films.forEach((f,i)=>{ html+=buildFilmItem(f,idx++,showOrderBadge,true); });

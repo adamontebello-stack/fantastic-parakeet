@@ -507,7 +507,7 @@ main {
 .btn-sm { padding: 7px 15px; font-size: 0.74rem; }
 
 /* ===== STATS ===== */
-.stats-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.3rem; }
+.stats-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.3rem; justify-content: center; }
 .stat-pill {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -1514,6 +1514,83 @@ main {
   word-break: break-word;
 }
 
+/* ===== FILM VIEW TABS ===== */
+.film-view-tabs {
+  display: flex; gap: 6px;
+  margin-bottom: 1.2rem;
+  justify-content: center;
+}
+.film-view-tab {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  color: var(--muted2);
+  padding: 7px 16px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  transition: all 0.2s cubic-bezier(0.34,1.4,0.64,1);
+  user-select: none;
+}
+.film-view-tab:hover {
+  border-color: var(--accent);
+  color: var(--accent2);
+  background: var(--card-hover);
+}
+.film-view-tab.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 3px 12px var(--accentGlow);
+}
+
+/* ===== FILM NOTES TOOLTIP BADGE (like rm-notes-badge) ===== */
+.film-notes-wrap {
+  display: inline-flex; align-items: center;
+}
+.film-notes-badge {
+  font-size: 0.6rem;
+  font-family: 'DM Mono', monospace;
+  font-weight: 700;
+  color: var(--muted2);
+  background: var(--surface3);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 1px 6px;
+  cursor: default;
+  letter-spacing: 0.04em;
+  transition: border-color 0.18s, color 0.18s;
+  user-select: none;
+}
+.film-notes-badge.hovered {
+  border-color: var(--accent);
+  color: var(--accent2);
+}
+
+/* ===== FILM FRANCHISE EXTRA TAGS ===== */
+.film-franchise-seen-tag {
+  font-size: 0.57rem; font-weight: 700;
+  color: var(--green);
+  background: rgba(46,232,165,0.12);
+  border: 1px solid rgba(46,232,165,0.28);
+  padding: 2px 8px; border-radius: 30px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  font-family: 'DM Mono', monospace;
+  flex-shrink: 0;
+}
+.film-franchise-roadmap-tag {
+  font-size: 0.57rem; font-weight: 700;
+  color: var(--accent2);
+  background: rgba(255,42,59,0.1);
+  border: 1px solid rgba(255,42,59,0.28);
+  padding: 2px 8px; border-radius: 30px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  font-family: 'DM Mono', monospace;
+  flex-shrink: 0;
+}
+
 </style>
 </head>
 <body class="theme-dark">
@@ -1607,7 +1684,7 @@ main {
   <div class="sec-header">
     <h2 class="sec-title">Roadmap</h2>
     <div style="display:flex;gap:7px;">
-      <button class="btn btn-ghost btn-sm" onclick="addRandom()">⚄ Random</button>
+      <button class="btn btn-ghost btn-sm" onclick="addRandom()">Random</button>
       <button class="btn btn-sm" onclick="addRandom('DUB')">+ DUB</button>
       <button class="btn btn-sm" onclick="addRandom('SUB')">+ SUB</button>
     </div>
@@ -1659,15 +1736,15 @@ main {
 
   <!-- ADD BUTTONS -->
   <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:1rem;">
-    <button class="btn btn-ghost btn-sm" onclick="openFilmSeriesModal()">🎬 Gestisci Saghe</button>
+    <button class="btn btn-ghost btn-sm" onclick="openFilmSeriesModal()">Gestisci Saghe</button>
     <button class="btn" onclick="openAddFilmModal()">+ Aggiungi film</button>
   </div>
 
   <!-- STATS -->
   <div class="stats-bar" id="filmStats"></div>
 
-  <!-- SEARCH -->
-  <div class="search-row" style="margin-bottom:1rem">
+  <!-- SEARCH + VIEW TABS -->
+  <div class="search-row" style="margin-bottom:0.75rem">
     <input class="search-input" type="text" placeholder="Cerca nei film…" id="filmSearch" oninput="renderFilms()">
     <select class="sort-select" id="filmSort" onchange="renderFilms()">
       <option value="title">A–Z</option>
@@ -1678,24 +1755,26 @@ main {
       <option value="DUB">Solo DUB</option>
       <option value="SUB">Solo SUB</option>
     </select>
-    <select class="sort-select" id="filmSagaFilter" onchange="renderFilms()">
-      <option value="all">Tutte le saghe</option>
-    </select>
+  </div>
+  <div class="film-view-tabs" id="filmViewTabs">
+    <button class="film-view-tab" data-tab="standalone" onclick="toggleFilmTab('standalone')">Stand-alone</button>
+    <button class="film-view-tab" data-tab="saghe" onclick="toggleFilmTab('saghe')">Saghe</button>
+    <button class="film-view-tab" data-tab="completati" onclick="toggleFilmTab('completati')">Completati</button>
   </div>
 
   <!-- CATALOGO FILM -->
-  <div class="sec-header" style="margin-bottom:0.7rem">
+  <div class="sec-header" style="margin-bottom:0.7rem" id="film-catalog-header">
     <h2 class="sec-title">Catalogo Film</h2>
     <span class="count-badge" id="film-catalog-count">0</span>
   </div>
   <div id="film-catalog-container"></div>
 
   <!-- FILM COMPLETATI -->
-  <div class="sec-header" style="margin-top:2rem;margin-bottom:0.7rem">
+  <div class="sec-header" style="margin-top:2rem;margin-bottom:0.7rem" id="film-completed-header">
     <h2 class="sec-title">Film Completati</h2>
     <span class="count-badge" id="film-completed-count">0</span>
   </div>
-  <div class="search-row" style="margin-bottom:0.8rem">
+  <div class="search-row" style="margin-bottom:0.8rem" id="film-completed-search-row">
     <input class="search-input" type="text" placeholder="Cerca nei completati…" id="filmCompletedSearch" oninput="renderFilmsCompleted()">
     <select class="sort-select" id="filmCompletedSort" onchange="renderFilmsCompleted()">
       <option value="recent">Recenti</option>
@@ -2119,10 +2198,10 @@ function buildItemHTML(s, i){
       <div class="item-num">${i+1}</div>
       <div class="item-info">
         <div class="item-title">${s.title}</div>
-        ${s.notes ? `<div class="item-notes">📋 ${s.notes}</div>` : ''}
+        ${s.notes ? `<div class="item-notes">${s.notes}</div>` : ''}
       </div>
       ${s.ongoing ? `<span class="ongoing-tag">▶ In corso</span>` : ''}
-      ${s.films ? `<span class="film-tag">🎬 ${s.films} film</span>` : ''}
+      ${s.films ? `<span class="film-tag">${s.films} film</span>` : ''}
       <div class="item-eps">${s.eps} ep</div>
       <button class="fav-btn ${s.favorite ? 'active' : ''}" onclick="event.stopPropagation();toggleFavorite('${s.id}')" title="Preferito">★</button>
     </div>`;
@@ -2157,7 +2236,7 @@ function openSeriesDetail(id){
   tagsEl.innerHTML =
     `<span class="badge ${s.type.toLowerCase()}">${s.type}</span>` +
     (s.ongoing ? '<span class="ongoing-tag">▶ In corso</span>' : '') +
-    (s.films  ? `<span class="film-tag">🎬 ${s.films} film</span>` : '');
+    (s.films  ? `<span class="film-tag">${s.films} film</span>` : '');
 
   document.getElementById('sdTitle').textContent = s.title;
 
@@ -2175,7 +2254,7 @@ function openSeriesDetail(id){
   // Notes
   if(s.notes){
     html += '<div>';
-    html += '<div class="sd-section-label">📋 Note / Watch Order</div>';
+    html += '<div class="sd-section-label">Note / Watch Order</div>';
     html += `<div class="sd-notes">${s.notes.replace(/</g,'&lt;')}</div>`;
     html += '</div>';
   }
@@ -2194,12 +2273,12 @@ function openSeriesDetail(id){
 
   if(linked.length){
     html += '<div>';
-    html += `<div class="sd-section-label">🎬 Film collegati (${linked.length})</div>`;
+    html += `<div class="sd-section-label">Film collegati (${linked.length})</div>`;
     html += '<div class="sd-films-list">';
     linked.forEach(f=>{
       const ord = f.seriesOrder ? `<span class="sd-film-order">${getOrdinal(f.seriesOrder)}</span>` : '';
       const done = completedFilmIds.has(f.id) ? `<span style="color:var(--green);font-size:0.75rem;margin-left:auto;flex-shrink:0;">✓</span>` : '';
-      const notesHtml = f.notes ? `<div class="sd-film-notes">📋 ${f.notes.replace(/</g,'&lt;')}</div>` : '';
+      const notesHtml = f.notes ? `<div class="sd-film-notes">${f.notes.replace(/</g,'&lt;')}</div>` : '';
       html += `<div class="sd-film-item" style="flex-wrap:wrap;">${ord}<div style="flex:1;min-width:0;"><div class="sd-film-title">${f.title}</div>${notesHtml}</div><span class="badge ${f.type.toLowerCase()}" style="font-size:0.55rem;padding:2px 6px;flex-shrink:0;">${f.type}</span>${done}</div>`;
     });
     html += '</div></div>';
@@ -2426,10 +2505,34 @@ function buildRmItemHTML(r, i){
   // Fetch notes from db.series for this roadmap entry
   const _srcSeries = db.series.find(x=>x.id===r.id);
   const _notes = _srcSeries?.notes || r.notes || '';
-  const notesTooltip = _notes ? `<div class="rm-notes-wrap"><span class="rm-notes-badge" data-tooltip="${_notes.replace(/"/g,'&quot;').replace(/</g,'&lt;')}" onmouseenter="showRmTooltip(this)" onmouseleave="hideRmTooltip()">📋 note</span></div>` : '';
+  const notesTooltip = _notes ? `<div class="rm-notes-wrap"><span class="rm-notes-badge" data-tooltip="${_notes.replace(/"/g,'&quot;').replace(/</g,'&lt;')}" onmouseenter="showRmTooltip(this)" onmouseleave="hideRmTooltip()">NOTE</span></div>` : '';
   const _filmsCount = _srcSeries?.films || 0;
-  const filmsTag = _filmsCount > 0 ? ` · <span class="film-tag">🎬 ${_filmsCount} film</span>` : '';
-  return `<div class="rm-item ${r.status==='watching'?'watching':''}" data-id="${r.id}" style="animation:itemIn .22s ${i*0.04}s both">
+  let filmsTag = '';
+  if(_filmsCount > 0){
+    // Build film list for tooltip from db
+    const allFilms = [...(db.films||[]), ...(db.filmsCompleted||[])];
+    // Try to find a matching saga by series id or title similarity
+    const allSeriesMap2 = {};
+    (db.filmSeries||[]).forEach(s=>{ allSeriesMap2[s.id]=s; });
+    // Find films belonging to a saga whose title overlaps with the series title
+    const seriesTitle = (_srcSeries?.title||'').toLowerCase();
+    let matchedFilms = allFilms.filter(f=>{
+      if(!f.seriesId) return false;
+      const saga = allSeriesMap2[f.seriesId];
+      if(!saga) return false;
+      const st = saga.title.toLowerCase();
+      return st.includes(seriesTitle.split(' ')[0]) || seriesTitle.includes(st.split(' ')[0]);
+    });
+    if(!matchedFilms.length) matchedFilms = allFilms.filter(f=>f.seriesId===r.id);
+    matchedFilms.sort((a,b)=>(a.seriesOrder||999)-(b.seriesOrder||999));
+    const completedIds = new Set((db.filmsCompleted||[]).map(f=>f.id));
+    const filmListStr = matchedFilms.length
+      ? matchedFilms.map((f,i)=>`${completedIds.has(f.id)?'✓':' '} ${getOrdinal(i+1)} ${f.title}`).join('\n')
+      : `${_filmsCount} film associati`;
+    const tooltipText = filmListStr.replace(/"/g,'&quot;').replace(/</g,'&lt;');
+    filmsTag = ` · <span class="rm-notes-badge" data-tooltip="${tooltipText}" onmouseenter="showRmTooltip(this)" onmouseleave="hideRmTooltip()">${_filmsCount} FILM</span>`;
+  }
+  return `<div class="rm-item ${r.status==='watching'?'watching':''}" data-id="${r.id}" style="animation:itemIn .22s ${i*0.04}s both;cursor:pointer;" onclick="handleRmItemClick(event,'${r.id}')">
     <div class="drag-handle">⠿</div>
     <div class="rm-num">${String(i+1).padStart(2,'0')}</div>
     <div class="rm-info">
@@ -2450,6 +2553,15 @@ function buildRmItemHTML(r, i){
       <button class="item-btn danger" onclick="dropEntry('${r.id}')">✕</button>
     </div>
   </div>`;
+}
+
+function handleRmItemClick(e, id){
+  // Don't trigger if clicking on buttons, inputs, drag handle, or badges
+  const tag = e.target.tagName;
+  if(tag==='BUTTON'||tag==='INPUT'||e.target.classList.contains('drag-handle')||
+     e.target.classList.contains('rm-notes-badge')||e.target.closest('.rm-actions')||
+     e.target.closest('.reorder-btns')||e.target.closest('.ep-stepper')) return;
+  openEditModal(id);
 }
 
 function updateEp(id,val){
@@ -2869,7 +2981,7 @@ function populateFilmSeriesSelect(selectId='filmSeriesSelect', orderGroupId='fil
   });
   if(animeSagas.length){
     const grpAnime = document.createElement('optgroup');
-    grpAnime.label = '📺 Saga Anime';
+    grpAnime.label = 'Saga Anime';
     animeSagas.forEach(s=>{
       const used = [...(db.films||[]), ...(db.filmsCompleted||[])].filter(f=>f.seriesId===s.id && f.id!==excludeFilmId).length;
       const opt = document.createElement('option');
@@ -2884,7 +2996,7 @@ function populateFilmSeriesSelect(selectId='filmSeriesSelect', orderGroupId='fil
   const filmSagas = getAvailableFilmSeries(excludeFilmId, currentSeriesId);
   if(filmSagas.length){
     const grpFilm = document.createElement('optgroup');
-    grpFilm.label = '🎬 Saga Film';
+    grpFilm.label = 'Saga Film';
     filmSagas.forEach(s=>{
       const used = [...(db.films||[]), ...(db.filmsCompleted||[])].filter(f=>f.seriesId===s.id && f.id!==excludeFilmId).length;
       const opt = document.createElement('option');
@@ -3101,8 +3213,47 @@ function buildFilmItemHTML(film, idx){
   </div>`;
 }
 
+// ---- FILM VIEW TABS ----
+let _filmActiveTab = null; // null = all, 'standalone'|'saghe'|'completati'
+function toggleFilmTab(tab){
+  if(_filmActiveTab === tab){
+    _filmActiveTab = null;
+  } else {
+    _filmActiveTab = tab;
+  }
+  document.querySelectorAll('.film-view-tab').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.tab === _filmActiveTab);
+  });
+  applyFilmTabVisibility();
+}
+function applyFilmTabVisibility(){
+  const showCatalog = _filmActiveTab === null || _filmActiveTab === 'standalone' || _filmActiveTab === 'saghe';
+  const showCompleted = _filmActiveTab === null || _filmActiveTab === 'completati';
+  const catalogHdr = document.getElementById('film-catalog-header');
+  const catalogBox = document.getElementById('film-catalog-container');
+  const completedHdr = document.getElementById('film-completed-header');
+  const completedSR = document.getElementById('film-completed-search-row');
+  const completedBox = document.getElementById('film-completed-container');
+  [catalogHdr, catalogBox].forEach(el=>{ if(el) el.style.display = showCatalog ? '' : 'none'; });
+  [completedHdr, completedSR, completedBox].forEach(el=>{ if(el) el.style.display = showCompleted ? '' : 'none'; });
+
+  // Within catalog: filter franchise vs standalone blocks
+  if(showCatalog && _filmActiveTab !== null){
+    const franchiseBlocks = document.querySelectorAll('#film-catalog-container .film-franchise-block');
+    const standaloneBlock = document.querySelector('#film-catalog-container .film-standalone-block');
+    const showFranchise = _filmActiveTab === 'saghe';
+    const showStandalone = _filmActiveTab === 'standalone';
+    franchiseBlocks.forEach(b=>{ b.style.display = showFranchise ? '' : 'none'; });
+    if(standaloneBlock) standaloneBlock.style.display = showStandalone ? '' : 'none';
+  } else if(showCatalog){
+    // All visible
+    document.querySelectorAll('#film-catalog-container .film-franchise-block').forEach(b=>{ b.style.display=''; });
+    const sb = document.querySelector('#film-catalog-container .film-standalone-block');
+    if(sb) sb.style.display='';
+  }
+}
+
 function renderFilms(){
-  // Preserva solo la saga selezionata — l'ordine viene ricalcolato automaticamente al primo slot libero
   const _curSeries = document.getElementById('filmSeriesSelect')?.value || null;
   populateFilmSeriesSelect('filmSeriesSelect','filmOrderGroup','filmOrderSelect', null, _curSeries, null);
   updateFilmStats();
@@ -3112,35 +3263,21 @@ function renderFilms(){
   (db.filmSeries||[]).forEach(s=>{ allSeriesMap[s.id]=s; });
   getAnimeSagas().forEach(s=>{ if(!allSeriesMap[s.id]) allSeriesMap[s.id]=s; });
 
-  // Populate saga filter dropdown
-  const sagaSel = document.getElementById('filmSagaFilter');
-  const prevSaga = sagaSel?.value || 'all';
-  if(sagaSel){
-    const allFilmsForSagas = [...(db.films||[]), ...(db.filmsCompleted||[])];
-    const usedSagaIds = [...new Set(allFilmsForSagas.map(f=>f.seriesId).filter(Boolean))];
-    sagaSel.innerHTML = '<option value="all">Tutte le saghe</option>' +
-      usedSagaIds.map(id=>{
-        const s = allSeriesMap[id];
-        const name = s ? s.title : 'Saga rimossa';
-        return `<option value="${id}"${prevSaga===id?' selected':''}>${name}</option>`;
-      }).join('') +
-      `<option value="__standalone__"${prevSaga==='__standalone__'?' selected':''}>Stand-alone</option>`;
-  }
-  const sagaF = sagaSel?.value || 'all';
-
   const q = (document.getElementById('filmSearch')?.value||'').toLowerCase();
   const sort = document.getElementById('filmSort')?.value||'title';
   const typeF = document.getElementById('filmTypeFilter')?.value||'all';
   let films = (db.films||[]).filter(f=>
     (!q || f.title.toLowerCase().includes(q)) &&
-    (typeF==='all' || f.type===typeF) &&
-    (sagaF==='all' || (sagaF==='__standalone__' ? !f.seriesId : f.seriesId===sagaF))
+    (typeF==='all' || f.type===typeF)
   );
   films.sort((a,b)=> sort==='recent' ? (b.addedAt||0)-(a.addedAt||0) : a.title.localeCompare(b.title));
 
   const container = document.getElementById('film-catalog-container');
   if(!container) return;
-  if(!films.length){ container.innerHTML=`<div class="empty"><div class="empty-icon">◌</div>Nessun film nel catalogo</div>`; return; }
+  if(!films.length){ container.innerHTML=`<div class="empty"><div class="empty-icon">◌</div>Nessun film nel catalogo</div>`; applyFilmTabVisibility(); return; }
+
+  // Pre-compute completed film set
+  const completedFilmIds = new Set((db.filmsCompleted||[]).map(f=>f.id));
 
   let html = '';
 
@@ -3159,9 +3296,8 @@ function renderFilms(){
     byFranchise[id].sort((a,b)=>(a.seriesOrder||999)-(b.seriesOrder||999));
   });
 
-  // Franchise blocks — ordered by saga title
+  // Franchise blocks
   const sagaIds = Object.keys(allSeriesMap).filter(id=>byFranchise[id]);
-  // Include orphan seriesIds
   Object.keys(byFranchise).forEach(id=>{ if(!sagaIds.includes(id)) sagaIds.push(id); });
 
   sagaIds.forEach(fsId=>{
@@ -3169,10 +3305,34 @@ function renderFilms(){
     if(!fsFilms) return;
     const saga = allSeriesMap[fsId];
     const fsName = saga ? saga.title : 'Saga rimossa';
+    const allSagaFilms = [...(db.films||[]), ...(db.filmsCompleted||[])].filter(f=>f.seriesId===fsId);
+    const totalSagaFilms = allSagaFilms.length;
+
+    // "X visti" tag: saga with >1 film, some completed
+    const seenCount = allSagaFilms.filter(f=>completedFilmIds.has(f.id)).length;
+    const seenTag = (totalSagaFilms > 1 && seenCount > 0) ? `<span class="film-franchise-seen-tag">✓ ${seenCount} visti</span>` : '';
+
+    // "In roadmap #N" tag: check if any series in roadmap matches this saga
+    let roadmapTag = '';
+    const rmEntry = db.roadmap.find(r=>{
+      if(r.id === fsId) return true;
+      const rSeries = db.series.find(s=>s.id===r.id);
+      if(!rSeries) return false;
+      const st=rSeries.title.toLowerCase();
+      const ft=fsName.toLowerCase();
+      return st.includes(ft)||ft.includes(st)||st.split(' ').some(w=>w.length>3&&ft.includes(w));
+    });
+    if(rmEntry){
+      const rmPos = db.roadmap.findIndex(r=>r.id===rmEntry.id)+1;
+      roadmapTag = `<span class="film-franchise-roadmap-tag">▶ N°${rmPos}</span>`;
+    }
+    // Film list tooltip removed from catalog header
     html += `<div class="film-franchise-block collapsed" id="franchise-block-${fsId}">
       <div class="film-franchise-header" onclick="toggleFranchiseCollapse('${fsId}')">
         <span class="film-franchise-name">${fsName}</span>
-        <span class="film-franchise-count">${fsFilms.length} film</span>
+        ${seenTag}
+        ${roadmapTag}
+        <span class="film-franchise-count">${fsFilms.length} Film</span>
         <span class="film-franchise-collapse-icon">▾</span>
       </div>
       <div class="film-franchise-list">
@@ -3190,6 +3350,7 @@ function renderFilms(){
   }
 
   container.innerHTML = html;
+  applyFilmTabVisibility();
 }
 
 function toggleFranchiseCollapse(fsId){
