@@ -143,7 +143,19 @@ body::after {
 }
 
 /* ===== TOP HEADER (logo + actions) ===== */
-/* top-bar removed */
+.top-bar {
+  position: sticky; top: 0; z-index: 200;
+  padding: 0 16px;
+  padding-top: env(safe-area-inset-top);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  backdrop-filter: blur(28px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+}
+.top-bar-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; min-height: 42px;
+}
 
 .logo {
   display: flex; align-items: center; gap: 9px;
@@ -230,7 +242,6 @@ body::after {
   backdrop-filter: blur(28px) saturate(160%);
   border-top: 1px solid var(--border);
   display: flex; gap: 4px; justify-content: space-around;
-  will-change: transform;
 }
 .tab-btn {
   flex: 1;
@@ -261,14 +272,16 @@ body::after {
 
 /* ===== MAIN CONTENT ===== */
 main {
-  position: relative; z-index: 1;
+  position: relative;
   padding: 10px 14px 0;
-  padding-bottom: calc(56px + var(--safe-bottom));
+  padding-bottom: calc(72px + var(--safe-bottom));
   max-width: 480px;
   margin: 0 auto;
 }
 .section { display: none; animation: fadeUp 0.28s cubic-bezier(0.2,0.8,0.3,1); }
 .section.active { display: block; }
+/* Prevent programma (and any section) from pushing bottom-nav up */
+#programma { min-height: unset; }
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -892,8 +905,8 @@ input[type="number"] { -moz-appearance: textfield; }
   white-space: nowrap;
 }
 @keyframes watchPulse {
-  0%,100% { box-shadow: 0 0 0px rgba(255, 255, 255, 0.55); }
-  50%      { box-shadow: 0 0 7px rgba(255, 255, 255, 0.55); }
+  0%,100% { box-shadow: 0 0 0px var(--accentGlow); }
+  50%      { box-shadow: 0 0 7px var(--accentGlow); }
 }
 
 /* Check mark */
@@ -1634,6 +1647,15 @@ input[type="number"] { -moz-appearance: textfield; }
 
 <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
 
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-bar-inner">
+    <div class="logo">
+      <div class="logo-icon">ST</div>
+      <div class="logo-text">Serie<span>Tracker</span></div>
+    </div>
+  </div>
+</div>
 
 <!-- MAIN -->
 <main>
@@ -1688,7 +1710,7 @@ input[type="number"] { -moz-appearance: textfield; }
   <div class="sec-header" style="margin-bottom:12px">
     <h2 class="sec-title">Film</h2>
     <div class="sec-btns">
-      <button class="btn btn-ghost btn-sm" onclick="openFilmSeriesManager()">Saghe</button>
+      <button class="btn btn-ghost btn-sm" onclick="openFilmSeriesManager()">🎬 Saghe</button>
       <button class="add-btn" onclick="openAddFilmPopup()">＋ Aggiungi</button>
     </div>
   </div>
@@ -1711,9 +1733,9 @@ input[type="number"] { -moz-appearance: textfield; }
   <div class="sec-header">
     <h2 class="sec-title">Roadmap</h2>
     <div class="sec-btns">
-      <button class="btn btn-ghost btn-sm" onclick="addRandom()">Random</button>
-      <button class="btn btn-sm" onclick="addRandom('DUB')">+DUB</button>
-      <button class="btn btn-sm" onclick="addRandom('SUB')">+SUB</button>
+      <button class="btn btn-ghost btn-sm" onclick="addRandom()">⚄ Random</button>
+      <button class="btn btn-sm" onclick="addRandom('DUB')">+D</button>
+      <button class="btn btn-sm" onclick="addRandom('SUB')">+S</button>
     </div>
   </div>
   <div class="stats-bar">
@@ -1841,7 +1863,7 @@ input[type="number"] { -moz-appearance: textfield; }
     </div>
     <div class="edit-modal-field">
       <div class="toggle-row">
-        <span class="toggle-label-text">In corso (ongoing)</span>
+        <span class="toggle-label-text">📡 In corso (ongoing)</span>
         <div class="toggle-switch" id="em-ongoing"></div>
       </div>
     </div>
@@ -1937,7 +1959,7 @@ input[type="number"] { -moz-appearance: textfield; }
 <div class="popup-overlay" id="filmSeriesManagerPopup">
   <div class="popup-box" onclick="event.stopPropagation()">
     <div class="popup-header">
-      <span class="popup-title">Gestisci Saghe</span>
+      <span class="popup-title">🎬 Gestisci Saghe</span>
       <button class="popup-close" onclick="closeFilmSeriesManager()">✕</button>
     </div>
     <div class="popup-field">
@@ -1964,7 +1986,7 @@ input[type="number"] { -moz-appearance: textfield; }
 <div class="popup-overlay" id="addFilmPopup">
   <div class="popup-box" onclick="event.stopPropagation()">
     <div class="popup-header">
-      <span class="popup-title">Nuovo film</span>
+      <span class="popup-title">🎬 Nuovo film</span>
       <button class="popup-close" onclick="closeAddFilmPopup()">✕</button>
     </div>
     <div class="popup-field">
@@ -2201,7 +2223,7 @@ function renderList(id,data){
   if(!data.length){ el.innerHTML='<div class="empty"><div class="empty-icon">◌</div>Nessuna serie</div>'; return; }
   el.innerHTML=data.map((s,i)=>{
     let tagsHtml='';
-    if(s.ongoing) tagsHtml+='<span class="item-tag ongoing">▶ IN CORSO</span>';
+    if(s.ongoing) tagsHtml+='<span class="item-tag ongoing">IN CORSO</span>';
     if(s.films>0) tagsHtml+='<span class="item-tag films">'+s.films+' FILM</span>';
     const tagsRow=tagsHtml?'<div class="item-tags">'+tagsHtml+'</div>':'';
     const notesRow=s.notes?'<div class="item-notes-row">📝 '+escHtml(s.notes)+'</div>':'';
@@ -2329,7 +2351,7 @@ function saveEditModal(){
   const itemEl=document.getElementById('item-'+_editModalId);
   if(itemEl){
     const tags=[];
-    if(s.ongoing) tags.push(`<span class="item-tag ongoing">▶ IN CORSO</span>`);
+    if(s.ongoing) tags.push(`<span class="item-tag ongoing">IN CORSO</span>`);
     if(s.films>0) tags.push(`<span class="item-tag films">${s.films} FILM</span>`);
     const body=itemEl.querySelector('.item-body');
     if(body){
@@ -2541,7 +2563,7 @@ function renderRoadmap(){
   if(!db.roadmap.length){ el.innerHTML='<div class="empty"><div class="empty-icon">▷</div>Roadmap vuota</div>'; return; }
   el.innerHTML=db.roadmap.map((r,i)=>{
     const isW=r.status==='watching';
-    const watchTag=isW?'<div class="watching-tag" style="flex-shrink:0">●WATCHING</div>':'';
+    const watchTag=isW?'<div class="watching-tag" style="flex-shrink:0">WATCHING</div>':'';
     const pct=Math.round((r.currentEp||0)/r.eps*100);
     const progressRow=isW
       ?'<div class="progress-row">'
@@ -2841,12 +2863,12 @@ function populateFilmSagaSelect(selectId, currentSeriesId='', excludeFilmId=null
 
   let html='<option value="">— Stand-alone —</option>';
   if(animeAvail.length){
-    html+=`<optgroup label="Saga Anime">`;
+    html+=`<optgroup label="📺 Saga Anime">`;
     animeAvail.forEach(s=>{ html+=`<option value="${s.id}"${s.id===currentSeriesId?' selected':''}>${escHtml(s.title)}</option>`; });
     html+='</optgroup>';
   }
   if(filmAvail.length){
-    html+=`<optgroup label="Saga Film">`;
+    html+=`<optgroup label="🎬 Saga Film">`;
     filmAvail.forEach(s=>{ html+=`<option value="${s.id}"${s.id===currentSeriesId?' selected':''}>${escHtml(s.title)}</option>`; });
     html+='</optgroup>';
   }
@@ -3144,16 +3166,16 @@ function renderFilms(){
     <div class="stat-pill"><span class="dot green"></span> Completati: <strong>${db.filmsCompleted.length}</strong></div>`;
 
   const el=document.getElementById('film-list');
-  if(!data.length){ el.innerHTML='<div class="empty">Nessun film in catalogo</div>'; }
+  if(!data.length){ el.innerHTML='<div class="empty"><div class="empty-icon">🎬</div>Nessun film in catalogo</div>'; }
   else {
     const buildFilmItem=(f,i,showBadge=false,insideSaga=false)=>{
       const rec=f.seriesId?getSeriesRecord(f.seriesId):null;
       const typeColor=f.type==='DUB'?'var(--dub-color)':'var(--sub-color)';
       const tagHtml=(rec&&!insideSaga)
-        ?`<span class="film-tag da-serie">${rec._source==='anime'?'anime':'saga'}</span>`
+        ?`<span class="film-tag da-serie">${rec._source==='anime'?'📺 anime':'🎬 saga'}</span>`
         :(!rec?`<span class="film-tag standalone">stand-alone</span>`:'');
       const orderBadge=(showBadge&&f.seriesOrder!=null)?`<span class="film-order-badge">${f.seriesOrder}°</span>`:'';
-      const serieNameHtml=(rec&&!insideSaga)?`<div class="film-serie-name">${escHtml(rec.title)}</div>`:'';
+      const serieNameHtml=(rec&&!insideSaga)?`<div class="film-serie-name">${rec._source==='anime'?'📺':'🎬'} ${escHtml(rec.title)}</div>`:'';
       const notesHtml=f.notes?`<div class="item-notes-row">📝 ${escHtml(f.notes)}</div>`:'';
       return `<div class="rm-item" data-id="${f.id}" style="animation:itemIn .2s ${i*0.025}s both">
         <div class="rm-num">${String(i+1).padStart(2,'0')}</div>
@@ -3183,7 +3205,7 @@ function renderFilms(){
       const typeLabel=isAnime?'anime':'film';
       html+=`<div class="film-saga-block">
         <div class="film-saga-header">
-          ${escHtml(sagaTitle)}
+          ${isAnime?'📺':'🎬'} ${escHtml(sagaTitle)}
           <span class="saga-type-badge ${typeLabel}">${typeLabel}</span>
         </div>`;
       films.forEach((f,i)=>{ html+=buildFilmItem(f,idx++,showOrderBadge,true); });
