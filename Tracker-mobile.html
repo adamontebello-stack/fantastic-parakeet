@@ -2470,10 +2470,10 @@ function renderRoadmap(){
     const progressRow=isW
       ?'<div class="progress-row">'
         +'<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div>'
-        +'<div class="ep-stepper-row">'
-          +'<button class="step-btn" onclick="stepEp(\''+r.id+'\',-1)">‹</button>'
-          +'<input class="ep-input" type="number" min="0" max="'+r.eps+'" value="'+(r.currentEp||0)+'" onchange="updateEp(\''+r.id+'\',this.value)">'
-          +'<button class="step-btn" onclick="stepEp(\''+r.id+'\',1)">›</button>'
+        +'<div class="ep-stepper-row" onclick="event.stopPropagation()">'
+          +'<button class="step-btn" onclick="event.stopPropagation();stepEp(\''+r.id+'\',-1)">‹</button>'
+          +'<input class="ep-input" type="number" min="0" max="'+r.eps+'" value="'+(r.currentEp||0)+'" onclick="event.stopPropagation()" onchange="event.stopPropagation();updateEp(\''+r.id+'\',this.value)">'
+          +'<button class="step-btn" onclick="event.stopPropagation();stepEp(\''+r.id+'\',1)">›</button>'
           +'<span class="progress-num">/ '+r.eps+'</span>'
         +'</div>'
       +'</div>'
@@ -2484,7 +2484,7 @@ function renderRoadmap(){
     const infoIcons=(hasNotes?'<span class="rm-info-icon">\ud83d\udcdd</span>':'')
                    +(hasFilms?'<span class="rm-info-icon">\ud83c\udfa6</span>':'');
     const canTap=hasNotes||hasFilms;
-    return '<div class="rm-item '+(isW?'watching':'')+(canTap?' has-detail':'')+' data-id="'+r.id+'" style="animation:itemIn .22s '+(i*0.04)+'s both"'+(canTap?' onclick="event.stopPropagation();openRoadmapDetail(\''+r.id+'\')"':'')+' >'
+    return '<div class="rm-item '+(isW?'watching':'')+(canTap?' has-detail':'')+'" data-id="'+r.id+'" style="animation:itemIn .22s '+(i*0.04)+'s both"'+(canTap?' onclick="event.stopPropagation();openRoadmapDetail(\''+r.id+'\')"':'')+' >'
       +'<div class="drag-handle">⠿</div>'
       +'<div class="rm-num">'+String(i+1).padStart(2,'0')+'</div>'
       +'<div class="rm-info">'
