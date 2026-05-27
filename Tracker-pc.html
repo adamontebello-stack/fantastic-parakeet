@@ -1615,7 +1615,7 @@ main {
   <div class="stats-bar">
     <div class="stat-pill"><span class="dot"></span> Roadmap: <strong id="roadmap-count">0</strong></div>
     <div class="stat-pill"><span class="dot red"></span> Dropped: <strong id="drop-count">0</strong></div>
-    <div class="stat-pill"><span class="dot amber"></span> Pattern: <strong id="pattern-display">DUB</strong></div>
+    <div class="stat-pill"><span class="dot" style="background:var(--accent2);box-shadow:0 0 5px var(--accent2)"></span> Watching: <strong id="watching-count">0</strong></div>
   </div>
   <div class="roadmap" id="roadmap"></div>
   <div class="section-label" id="dropped-label" style="display:none; margin: 0.8rem 0 0.3rem;">Droppate</div>
@@ -1677,6 +1677,9 @@ main {
       <option value="all">Tutti</option>
       <option value="DUB">Solo DUB</option>
       <option value="SUB">Solo SUB</option>
+    </select>
+    <select class="sort-select" id="filmSagaFilter" onchange="renderFilms()">
+      <option value="all">Tutte le saghe</option>
     </select>
   </div>
 
@@ -2068,6 +2071,19 @@ document.addEventListener('keydown', function(e){
     if(document.getElementById('filmSeriesModal').classList.contains('open')){ closeFilmSeriesModal(); return; }
     if(document.getElementById('importModal').classList.contains('open')){ closeImportModal(); return; }
     closeSettingsMenu();
+  }
+  if(e.key === 'i' || e.key === 'I'){
+    const anyModalOpen = ['addSeriesModal','addFilmModal','editFilmModal','editSeriesModal','filmSeriesModal','importModal'].some(id=>document.getElementById(id).classList.contains('open'));
+    const tag = e.target.tagName;
+    const isInput = tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT';
+    if(!anyModalOpen && !isInput){
+      e.preventDefault();
+      const active = document.querySelector('.section.active');
+      if(active){
+        if(active.id==='catalogo'){ openAddSeriesModal(); return; }
+        if(active.id==='film'){ openAddFilmModal(); return; }
+      }
+    }
   }
   if(e.key === 'Enter'){
     const tag = e.target.tagName;
@@ -2541,7 +2557,8 @@ function stepEp(id,delta){
 function renderRoadmap(){
   const el=document.getElementById('roadmap');
   document.getElementById('roadmap-count').textContent=db.roadmap.length;
-  document.getElementById('pattern-display').textContent=PATTERN[db.patternIndex];
+  const watchingEl=document.getElementById('watching-count');
+  if(watchingEl) watchingEl.textContent=db.roadmap.filter(r=>r.status==='watching').length;
   if(!db.roadmap.length){ el.innerHTML=`<div class="empty"><div class="empty-icon">▷</div>Roadmap vuota</div>`; return; }
   el.innerHTML=db.roadmap.map((r,i)=>buildRmItemHTML(r,i)).join('');
   initDragDrop(el,db.roadmap,renderRoadmap);
@@ -3089,12 +3106,35 @@ function renderFilms(){
   const _curSeries = document.getElementById('filmSeriesSelect')?.value || null;
   populateFilmSeriesSelect('filmSeriesSelect','filmOrderGroup','filmOrderSelect', null, _curSeries, null);
   updateFilmStats();
+
+  // Build a unified lookup combining db.filmSeries + anime sagas
+  const allSeriesMap = {};
+  (db.filmSeries||[]).forEach(s=>{ allSeriesMap[s.id]=s; });
+  getAnimeSagas().forEach(s=>{ if(!allSeriesMap[s.id]) allSeriesMap[s.id]=s; });
+
+  // Populate saga filter dropdown
+  const sagaSel = document.getElementById('filmSagaFilter');
+  const prevSaga = sagaSel?.value || 'all';
+  if(sagaSel){
+    const allFilmsForSagas = [...(db.films||[]), ...(db.filmsCompleted||[])];
+    const usedSagaIds = [...new Set(allFilmsForSagas.map(f=>f.seriesId).filter(Boolean))];
+    sagaSel.innerHTML = '<option value="all">Tutte le saghe</option>' +
+      usedSagaIds.map(id=>{
+        const s = allSeriesMap[id];
+        const name = s ? s.title : 'Saga rimossa';
+        return `<option value="${id}"${prevSaga===id?' selected':''}>${name}</option>`;
+      }).join('') +
+      `<option value="__standalone__"${prevSaga==='__standalone__'?' selected':''}>Stand-alone</option>`;
+  }
+  const sagaF = sagaSel?.value || 'all';
+
   const q = (document.getElementById('filmSearch')?.value||'').toLowerCase();
   const sort = document.getElementById('filmSort')?.value||'title';
   const typeF = document.getElementById('filmTypeFilter')?.value||'all';
   let films = (db.films||[]).filter(f=>
     (!q || f.title.toLowerCase().includes(q)) &&
-    (typeF==='all' || f.type===typeF)
+    (typeF==='all' || f.type===typeF) &&
+    (sagaF==='all' || (sagaF==='__standalone__' ? !f.seriesId : f.seriesId===sagaF))
   );
   films.sort((a,b)=> sort==='recent' ? (b.addedAt||0)-(a.addedAt||0) : a.title.localeCompare(b.title));
 
@@ -3103,10 +3143,6 @@ function renderFilms(){
   if(!films.length){ container.innerHTML=`<div class="empty"><div class="empty-icon">◌</div>Nessun film nel catalogo</div>`; return; }
 
   let html = '';
-  // Build a unified lookup combining db.filmSeries + anime sagas
-  const allSeriesMap = {};
-  (db.filmSeries||[]).forEach(s=>{ allSeriesMap[s.id]=s; });
-  getAnimeSagas().forEach(s=>{ if(!allSeriesMap[s.id]) allSeriesMap[s.id]=s; });
 
   // Group by seriesId
   const byFranchise = {};
@@ -3133,7 +3169,7 @@ function renderFilms(){
     if(!fsFilms) return;
     const saga = allSeriesMap[fsId];
     const fsName = saga ? saga.title : 'Saga rimossa';
-    html += `<div class="film-franchise-block" id="franchise-block-${fsId}">
+    html += `<div class="film-franchise-block collapsed" id="franchise-block-${fsId}">
       <div class="film-franchise-header" onclick="toggleFranchiseCollapse('${fsId}')">
         <span class="film-franchise-name">${fsName}</span>
         <span class="film-franchise-count">${fsFilms.length} film</span>
